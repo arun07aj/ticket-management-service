@@ -39,7 +39,7 @@ public class TicketController {
     public ResponseEntity<?> getAllTickets() {
         try {
             List<Ticket> ticketsList = ticketService.getAllTickets();
-            return new ResponseEntity<>(ticketsList, HttpStatus.FOUND);
+            return new ResponseEntity<>(ticketsList, HttpStatus.OK);
         }
         catch(Exception e) {
             logger.error("Error fetching ticket list:", e);
