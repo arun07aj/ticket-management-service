@@ -1,6 +1,7 @@
 // TicketForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import './TicketForm.css'; // Import the CSS file
 
 const TicketForm = () => {
     const [subject, setSubject] = useState('');
@@ -26,22 +27,37 @@ const TicketForm = () => {
     };
 
     return (
-        <div>
-            <h1>Create Ticket</h1>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Subject:
-                    <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} />
-                </label>
-                <br />
-                <label>
-                    Description:
-                    <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
-                </label>
-                <br />
-                <button type="submit">Submit</button>
+        <div className="ticket-container">
+            <h1 className="ticket-heading">Create Ticket</h1>
+            <form className="ticket-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label className="label" htmlFor="subject">
+                        Subject:
+                    </label>
+                    <input
+                        className="input"
+                        type="text"
+                        id="subject"
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                    />
+                </div>
+                <div className="form-group">
+                    <label className="label" htmlFor="description">
+                        Description:
+                    </label>
+                    <textarea
+                        className="description-input"
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                    />
+                </div>
+                <button className="button" type="submit">
+                    Submit
+                </button>
             </form>
-            <p>{message}</p>
+            <p className="message">{message}</p>
         </div>
     );
 };

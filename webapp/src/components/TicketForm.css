@@ -1,0 +1,65 @@
+/* TicketForm.css */
+.ticket-container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-heading {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.ticket-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the form items horizontally */
+}
+
+.form-group {
+    margin-bottom: 15px;
+    width: 100%; /* Ensure the form group takes full width */
+}
+
+.label {
+    margin-bottom: 5px;
+}
+
+.input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: calc(100% - 18px); /* Adjusted width calculation to account for padding */
+}
+
+/* Increase height for the description text box */
+.description-input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    height: 60px; /* Set height to 60px for description text box */
+    resize: vertical; /* Allow vertical resizing only */
+    width: calc(100% - 18px);
+    max-height: 350px;
+    /*max-width: calc(100% - 18px); !* Set max-width to prevent dragging outside container *!*/
+}
+
+.button {
+    background-color: #4caf50;
+    color: white;
+    padding: 8px 15px; /* Adjusted padding for a smaller button */
+    font-size: 14px; /* Adjusted font size for a smaller button */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 50%; /* Make the button take full width */
+}
+
+.message {
+    margin-top: 15px;
+    text-align: center;
+}

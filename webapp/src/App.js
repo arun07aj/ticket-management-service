@@ -5,7 +5,6 @@ import TicketForm from './components/TicketForm';
 function App() {
   return (
       <div>
-        <h1>Ticket Management Service</h1>
         <TicketForm />
       </div>
   );
