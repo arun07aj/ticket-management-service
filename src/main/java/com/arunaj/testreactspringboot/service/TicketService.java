@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class TicketService {
@@ -30,5 +31,9 @@ public class TicketService {
         // Check for non-null and non-empty values
         return ticket.getDescription() != null && !ticket.getDescription().isEmpty() &&
                 ticket.getSubject() != null && !ticket.getSubject().isEmpty();
+    }
+
+    public List<Ticket> getAllTickets() {
+        return ticketRepository.findAll();
     }
 }
