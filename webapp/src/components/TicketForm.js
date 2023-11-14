@@ -10,6 +10,12 @@ const TicketForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Check if subject and description are not null or empty
+        if (!subject || !description) {
+            setMessage('Please fill out both subject and description.');
+            return;
+        }
 
         try {
             // Call the createTicket API
