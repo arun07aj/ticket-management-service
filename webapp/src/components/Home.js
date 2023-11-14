@@ -1,12 +1,11 @@
-// src/components/Home.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Home.css';
+import './Home.css'; // Import the CSS file
 
 function Home() {
     return (
-        <div>
-            <h1>Welcome to the Ticket App</h1>
+        <div className="home-container">
+            <h1 className="home-heading">Welcome to the Ticket Management Service</h1>
             <Link to="/create-ticket">
                 <button>Create a New Ticket</button>
             </Link>
