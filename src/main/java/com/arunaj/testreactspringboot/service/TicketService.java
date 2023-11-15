@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TicketService {
@@ -35,5 +36,9 @@ public class TicketService {
 
     public List<Ticket> getAllTickets() {
         return ticketRepository.findAll();
+    }
+
+    public Optional<Ticket> getTicketById(long id) {
+        return ticketRepository.findById(id);
     }
 }
