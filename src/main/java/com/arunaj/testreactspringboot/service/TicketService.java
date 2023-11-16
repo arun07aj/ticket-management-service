@@ -19,7 +19,8 @@ public class TicketService {
 
         if(ticket != null) {
             ticket.setStatus("OPEN");
-            ticket.setTime(new Date(System.currentTimeMillis()));
+            ticket.setCreatedDate(new Date(System.currentTimeMillis()));
+            ticket.setLastUpdatedDate(ticket.getCreatedDate());
 
             if(isValidTicket(ticket)) {
                 return ticketRepository.save(ticket);

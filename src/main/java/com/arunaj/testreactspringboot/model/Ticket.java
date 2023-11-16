@@ -14,7 +14,8 @@ public class Ticket {
     private Long id;
     private String subject;
     private String description;
-    private Date time;
+    private Date createdDate;
+    private Date lastUpdatedDate;
     private String status;
 
     // Constructors, getters, and setters
@@ -23,11 +24,12 @@ public class Ticket {
         // Default constructor
     }
 
-    public Ticket(Long id, String subject, String description, Date time, String status) {
+    public Ticket(Long id, String subject, String description, Date createdDate, Date lastUpdatedDate, String status) {
         this.id = id;
         this.subject = subject;
         this.description = description;
-        this.time = time;
+        this.createdDate = createdDate;
+        this.lastUpdatedDate = lastUpdatedDate;
         this.status = status;
     }
 
@@ -57,12 +59,20 @@ public class Ticket {
         this.description = description;
     }
 
-    public Date getTime() {
-        return time;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastUpdatedDate() {
+        return lastUpdatedDate;
+    }
+
+    public void setLastUpdatedDate(Date lastUpdatedDate) {
+        this.lastUpdatedDate = lastUpdatedDate;
     }
 
     public String getStatus() {
