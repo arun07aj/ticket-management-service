@@ -34,7 +34,7 @@ const TicketList = () => {
                         <td>{ticket.id}</td>
                         <td>{ticket.subject}</td>
                         <td>{ticket.description}</td>
-                        <td>{ticket.time}</td>
+                        <td>{ticket.createdDate}</td>
                         <td>{ticket.status}</td>
                         <td>
                             <Link to={`/tickets/${ticket.id}`}>{`View Ticket #${ticket.id}`}</Link>
