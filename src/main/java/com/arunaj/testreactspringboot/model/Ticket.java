@@ -1,5 +1,6 @@
 package com.arunaj.testreactspringboot.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +14,7 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String subject;
+    @Column(length=1024)
     private String description;
     private Date createdDate;
     private Date lastUpdatedDate;
