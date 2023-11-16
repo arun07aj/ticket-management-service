@@ -5,7 +5,6 @@ import com.arunaj.testreactspringboot.exception.TicketNotFoundException;
 import com.arunaj.testreactspringboot.model.Ticket;
 import com.arunaj.testreactspringboot.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -46,7 +45,7 @@ public class TicketService {
         return ticketRepository.findById(id);
     }
 
-    public Ticket updateTicket(long id, TicketPatchDTO ticketPatchDTO) throws Exception {
+    public Ticket updateTicket(long id, TicketPatchDTO ticketPatchDTO) {
         Ticket existingTicket = ticketRepository.findById(id)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found for ID: " + id));
 
@@ -63,10 +62,6 @@ public class TicketService {
             existingTicket.setStatus(ticketPatchDTO.getUpdatedStatus());
         }
 
-
-
-        // Save the updated ticket
-        Ticket updatedTicket = ticketRepository.save(existingTicket);
-        return updatedTicket;
+        return ticketRepository.save(existingTicket);
     }
 }
