@@ -1,6 +1,7 @@
 // TicketForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 import './TicketForm.css'; // Import the CSS file
 
 const TicketForm = () => {
@@ -11,15 +12,19 @@ const TicketForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Check if subject and description are not null or empty
-        if (!subject || !description) {
+        // Sanitize user input using DOMPurify
+        const sanitizedSubject = DOMPurify.sanitize(subject);
+        const sanitizedDescription = DOMPurify.sanitize(description);
+
+        // Check if sanitized subject and description are not null or empty
+        if (!sanitizedSubject || !sanitizedDescription) {
             setMessage('Please fill out both subject and description.');
             return;
         }
 
         try {
             // Call the createTicket API
-            const response = await axios.post('/tickets/create', { subject, description });
+            const response = await axios.post('/tickets/create', { subject: sanitizedSubject, description: sanitizedDescription });
 
             // Handle the successful response
             setMessage(`Ticket created with ID: ${response.data.id}`);
