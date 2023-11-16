@@ -62,7 +62,7 @@ const ViewTicket = () => {
         <div>
             <h1>{`View Ticket #${ticketDetails.id}`}</h1>
             <p><strong>Subject:</strong> {ticketDetails.subject}</p>
-            <p><strong>Description:</strong> {ticketDetails.description}</p>
+            <p><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></p>
             <p><strong>Created Time:</strong> {ticketDetails.createdDate}</p>
             <p><strong>Last Updated Time:</strong> {ticketDetails.lastUpdatedDate}</p>
             <p><strong>Status:</strong> {ticketDetails.status}</p>

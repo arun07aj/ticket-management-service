@@ -22,8 +22,7 @@ const TicketList = () => {
                 <tr>
                     <th>ID</th>
                     <th>Subject</th>
-                    <th>Description</th>
-                    <th>Date</th>
+                    <th>Created Date</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
@@ -33,7 +32,6 @@ const TicketList = () => {
                     <tr key={ticket.id}>
                         <td>{ticket.id}</td>
                         <td>{ticket.subject}</td>
-                        <td>{ticket.description}</td>
                         <td>{ticket.createdDate}</td>
                         <td>{ticket.status}</td>
                         <td>
