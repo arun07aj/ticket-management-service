@@ -50,9 +50,12 @@ public class TicketService {
         Ticket existingTicket = ticketRepository.findById(id)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found for ID: " + id));
 
+        // Update lastUpdatedDate
+        existingTicket.setLastUpdatedDate(new Date(System.currentTimeMillis()));
+
         // Update description if provided
         if (ticketPatchDTO.getUpdatedDescription() != null) {
-            existingTicket.setDescription(existingTicket.getDescription() + "<br>###########################################<br>" + ticketPatchDTO.getUpdatedDescription());
+            existingTicket.setDescription(existingTicket.getDescription() + "<br>< " + existingTicket.getLastUpdatedDate() + " ><br>" + ticketPatchDTO.getUpdatedDescription());
         }
 
         // Update ticket status
@@ -60,8 +63,7 @@ public class TicketService {
             existingTicket.setStatus(ticketPatchDTO.getUpdatedStatus());
         }
 
-        // Update lastUpdatedDate
-        existingTicket.setLastUpdatedDate(new Date(System.currentTimeMillis()));
+
 
         // Save the updated ticket
         Ticket updatedTicket = ticketRepository.save(existingTicket);
