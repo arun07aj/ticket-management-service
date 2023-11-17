@@ -61,6 +61,10 @@ public class TicketService {
         if(ticketPatchDTO.getUpdatedStatus() != null) {
             existingTicket.setStatus(ticketPatchDTO.getUpdatedStatus());
         }
+        // if none mentioned then set it as OPEN
+        else{
+            existingTicket.setStatus("OPEN");
+        }
 
         return ticketRepository.save(existingTicket);
     }
