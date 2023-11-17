@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import DOMPurify from 'dompurify';
+import './ViewTicket.css';
 
 const ViewTicket = () => {
     const { id } = useParams();
@@ -59,16 +60,15 @@ const ViewTicket = () => {
     }
 
     return (
-        <div>
-            <h1>{`View Ticket #${ticketDetails.id}`}</h1>
-            <p><strong>Subject:</strong> {ticketDetails.subject}</p>
-            <p><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></p>
-            <p><strong>Created Time:</strong> {ticketDetails.createdDate}</p>
-            <p><strong>Last Updated Time:</strong> {ticketDetails.lastUpdatedDate}</p>
-            <p><strong>Status:</strong> {ticketDetails.status}</p>
+        <div className="ticket-container">
+            <h1 style={{ textAlign: 'center' }}>{`View Ticket #${ticketDetails.id}`}</h1>
+            <div className="ticket-details">
+                <p><strong>Subject:</strong> {ticketDetails.subject}</p>
+                <p><strong>Created Time:</strong> {ticketDetails.createdDate} | <strong>Status:</strong> {ticketDetails.status}</p>
+                <p><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></p>
+            </div>
 
-
-            <form onSubmit={handleCommentSubmit}>
+            <form className="comment-form" onSubmit={handleCommentSubmit}>
                 <div>
                     <label htmlFor="comments">Add Comment</label>
                     <textarea
