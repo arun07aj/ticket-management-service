@@ -1,5 +1,10 @@
 package com.arunaj.testreactspringboot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -8,10 +13,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
-public class Account {
+public class Account implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,6 +30,7 @@ public class Account {
     private AccountRole role;
     private boolean isActive;
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Ticket> tickets;
 
     public Account() {
@@ -50,6 +58,26 @@ public class Account {
         return username;
     }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return isActive;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return isActive;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return isActive;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -60,6 +88,11 @@ public class Account {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(getRole().name()));
     }
 
     public String getPassword() {
@@ -93,4 +126,6 @@ public class Account {
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
     }
+
+
 }

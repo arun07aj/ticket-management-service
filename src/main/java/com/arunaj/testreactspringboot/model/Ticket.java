@@ -1,5 +1,7 @@
 package com.arunaj.testreactspringboot.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.Entity;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -23,6 +25,7 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "account_id")
+    @JsonBackReference
     private Account account;
 
     // Constructors, getters, and setters
@@ -31,17 +34,17 @@ public class Ticket {
         // Default constructor
     }
 
-    public Ticket(Long id, String subject, String description, Date createdDate, Date lastUpdatedDate, String status) {
+    public Ticket(Long id, String subject, String description, Date createdDate, Date lastUpdatedDate, String status, Account account) {
         this.id = id;
         this.subject = subject;
         this.description = description;
         this.createdDate = createdDate;
         this.lastUpdatedDate = lastUpdatedDate;
         this.status = status;
+        this.account = account;
     }
 
     // Getters and setters
-
     public Long getId() {
         return id;
     }
@@ -88,5 +91,12 @@ public class Ticket {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }
