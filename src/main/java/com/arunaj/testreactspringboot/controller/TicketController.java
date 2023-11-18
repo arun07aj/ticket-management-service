@@ -4,8 +4,8 @@ import com.arunaj.testreactspringboot.dto.TicketPatchDTO;
 import com.arunaj.testreactspringboot.exception.TicketNotFoundException;
 import com.arunaj.testreactspringboot.model.Ticket;
 import com.arunaj.testreactspringboot.service.TicketService;
+import com.arunaj.testreactspringboot.util.LoggerUtil;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/tickets")
 public class TicketController {
-    private static final Logger logger = LoggerFactory.getLogger(TicketController.class);
+    private static final Logger logger = LoggerUtil.getLogger(TicketController.class);
 
     @Autowired
     private TicketService ticketService;
