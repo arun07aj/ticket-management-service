@@ -1,0 +1,13 @@
+# Development Environment Configuration Template
+
+# Database Configuration
+spring.datasource.url=jdbc:h2:mem:devdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=devuser
+spring.datasource.password=devpassword
+
+# Hibernate Configuration
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+# Server Configuration
+server.port=8080
