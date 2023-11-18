@@ -7,6 +7,9 @@ target/
 # Environment-specific properties files
 src/main/resources/application-*.properties
 
+# test sql data
+src/main/resources/import.sql
+
 ### STS ###
 .apt_generated
 .classpath
