@@ -17,12 +17,21 @@ public class TicketService {
     @Autowired
     private TicketRepository ticketRepository;
 
+    @Autowired
+    private AccountService accountService;
+
     public Ticket createTicket(Ticket ticket) throws Exception {
 
         if(ticket != null) {
             ticket.setStatus("OPEN");
             ticket.setCreatedDate(new Date(System.currentTimeMillis()));
             ticket.setLastUpdatedDate(ticket.getCreatedDate());
+
+            if(accountService.getCurrentLoggedInUser().isPresent()) {
+                ticket.setAccount(accountService.getCurrentLoggedInUser().get());
+            }
+            else
+                throw new Exception("current logged-in user returned null, cannot create ticket without valid user");
 
             if(isValidTicket(ticket)) {
                 return ticketRepository.save(ticket);
