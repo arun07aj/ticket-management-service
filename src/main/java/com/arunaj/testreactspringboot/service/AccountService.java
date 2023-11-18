@@ -35,6 +35,6 @@ public class AccountService implements UserDetailsService {
 
     private Collection<? extends GrantedAuthority> getAuthorities(Account account) {
         // extract and convert roles from your Account entity
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + account.getRole().name()));
+        return Collections.singletonList(new SimpleGrantedAuthority(account.getRole().name()));
     }
 }

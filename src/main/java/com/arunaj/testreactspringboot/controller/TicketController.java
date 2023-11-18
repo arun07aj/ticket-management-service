@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<?> createTicket(@RequestBody Ticket ticket) {
         try {
@@ -40,6 +42,7 @@ public class TicketController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/list")
     public ResponseEntity<?> getAllTickets() {
         try {
@@ -52,6 +55,7 @@ public class TicketController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/list/{id}")
     public ResponseEntity<?> getTicketById(@PathVariable long id) {
         try {
@@ -69,6 +73,7 @@ public class TicketController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @PatchMapping("/edit/{id}")
     public ResponseEntity<?> updateTicket(@PathVariable Long id, @RequestBody TicketPatchDTO ticketPatchDTO) {
         try {

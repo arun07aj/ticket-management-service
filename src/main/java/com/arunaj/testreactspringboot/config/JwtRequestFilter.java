@@ -1,0 +1,53 @@
+package com.arunaj.testreactspringboot.config;
+
+import com.arunaj.testreactspringboot.service.AccountService;
+import com.arunaj.testreactspringboot.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@Component
+public class JwtRequestFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String headerAuth = request.getHeader("Authorization");
+        String username;
+        String jwtToken;
+
+        if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
+            jwtToken = headerAuth.substring(7);
+
+            if (jwtUtil.validateToken(jwtToken)) {
+                username = jwtUtil.getUsernameFromToken(jwtToken);
+
+                UserDetails userDetails = accountService.loadUserByUsername(username);
+
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        username, null, userDetails.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+        else {
+            logger.warn("JWT Token does not begin with Bearer String");
+        }
+
+        filterChain.doFilter(request, response);
+    }
+}
