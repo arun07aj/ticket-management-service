@@ -4,6 +4,8 @@ import com.arunaj.testreactspringboot.dto.UserLoginDTO;
 import com.arunaj.testreactspringboot.model.Account;
 import com.arunaj.testreactspringboot.service.AccountService;
 import com.arunaj.testreactspringboot.util.JwtUtil;
+import com.arunaj.testreactspringboot.util.LoggerUtil;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/public")
 public class PublicController {
+    private static final Logger logger = LoggerUtil.getLogger(PublicController.class);
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -36,6 +39,7 @@ public class PublicController {
         final Optional<Account> account = accountService.loadAccountByUsername(loginDTO.getUsername());
         if(account.isPresent()) {
             final String token = jwtUtil.generateToken(account.get());
+            logger.info("login successful");
             return ResponseEntity.status(HttpStatus.OK).body(token);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");

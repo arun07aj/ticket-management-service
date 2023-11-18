@@ -2,6 +2,8 @@ package com.arunaj.testreactspringboot.service;
 
 import com.arunaj.testreactspringboot.model.Account;
 import com.arunaj.testreactspringboot.repository.AccountRepository;
+import com.arunaj.testreactspringboot.util.LoggerUtil;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 @Service
 public class AccountService implements UserDetailsService {
+    private static final Logger logger = LoggerUtil.getLogger(AccountService.class);
     @Autowired
     private AccountRepository accountRepository;
 
@@ -39,6 +42,7 @@ public class AccountService implements UserDetailsService {
                 return accountRepository.findAccountByUsername(authentication.getName());
             }
         }
+        logger.warn("current logged-in user could not be identified");
         return Optional.empty();
     }
 }

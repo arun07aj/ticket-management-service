@@ -49,17 +49,17 @@ public class JwtUtil {
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-            System.out.println("JWT Token OK");
+            logger.info("JWT Token OK");
             return true;
         } catch (MalformedJwtException ex) {
-            System.out.println("Invalid JWT Token");
+            logger.info("Invalid JWT Token");
         } catch (ExpiredJwtException ex) {
-            System.out.println("JWT Token has expired");
+            logger.info("JWT Token has expired");
         } catch (UnsupportedJwtException ex) {
-            System.out.println("Unsupported JWT Token");
+            logger.info("Unsupported JWT Token");
         } catch (IllegalArgumentException ex) {
             // JWT claims string is empty
-            System.out.println("Unable to get JWT Token");
+            logger.info("Unable to get JWT Token");
         }
         catch (Exception e) {
             logger.error("Exception occurred: " + e);

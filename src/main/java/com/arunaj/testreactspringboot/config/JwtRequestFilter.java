@@ -2,6 +2,8 @@ package com.arunaj.testreactspringboot.config;
 
 import com.arunaj.testreactspringboot.service.AccountService;
 import com.arunaj.testreactspringboot.util.JwtUtil;
+import com.arunaj.testreactspringboot.util.LoggerUtil;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +19,7 @@ import java.io.IOException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-
+    private static final Logger logger = LoggerUtil.getLogger(JwtRequestFilter.class);
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -26,6 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        logger.info("received request: " + request.getRequestURI());
         String headerAuth = request.getHeader("Authorization");
         String username;
         String jwtToken;
