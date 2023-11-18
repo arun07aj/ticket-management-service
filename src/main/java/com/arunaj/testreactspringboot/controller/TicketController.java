@@ -55,6 +55,18 @@ public class TicketController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    @GetMapping("/list/my")
+    public ResponseEntity<?> getAllTicketsOfCurrentLoggedInUser() {
+        try {
+            List<Ticket> ticketsList = ticketService.getAllTicketsOfCurrentLoggedInUser();
+            return new ResponseEntity<>(ticketsList, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error fetching ticket list of current logged-in user:", e);
+            return new ResponseEntity<>("Error fetching ticket list of user", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/list/{id}")
     public ResponseEntity<?> getTicketById(@PathVariable long id) {
