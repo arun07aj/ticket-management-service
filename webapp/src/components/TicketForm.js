@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import DOMPurify from 'dompurify';
-import './TicketForm.css'; // Import the CSS file
+import Cookies from 'js-cookie';
+import './TicketForm.css';
 
 const TicketForm = () => {
     const [subject, setSubject] = useState('');
@@ -23,8 +24,13 @@ const TicketForm = () => {
         }
 
         try {
+            // Retrieve the JWT token from the cookie
+            const jwtToken = Cookies.get('jwtToken');
+
             // Call the createTicket API
-            const response = await axios.post('/tickets/create', { subject: sanitizedSubject, description: sanitizedDescription });
+            const response = await axios.post('/tickets/create',
+                { subject: sanitizedSubject, description: sanitizedDescription },
+                {headers: {Authorization: `Bearer ${jwtToken}`}});
 
             // Handle the successful response
             setMessage(`Ticket created with ID: ${response.data.id}`);

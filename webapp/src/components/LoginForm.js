@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
+import Cookies from 'js-cookie';
 import './LoginForm.css'
 
 const LoginForm = ({ setAuthenticated }) => {
@@ -23,10 +24,10 @@ const LoginForm = ({ setAuthenticated }) => {
             });
 
             // API returns a token upon successful login
-            const token = response.data.token;
+            const token = response.data;
 
-            // Store the token in localStorage or cookies for future requests
-            localStorage.setItem('jwtToken', token);
+            // Store the token in a secure cookie
+            Cookies.set('jwtToken', token, { secure: true, sameSite: 'strict' });
 
             // Set the authentication state
             setAuthenticated(true);
