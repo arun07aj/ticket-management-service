@@ -6,11 +6,11 @@ function Home() {
     return (
         <div className="home-container">
             <h1 className="home-heading">Welcome to the Ticket Management Service</h1>
-            <Link to="/create-ticket">
-                <button>Create a New Ticket</button>
+            <Link to="/login">
+                <button>Login</button>
             </Link>
-            <Link to="/view-tickets">
-                <button>View Tickets</button>
+            <Link to="/signup">
+                <button>Sign Up</button>
             </Link>
         </div>
     );
