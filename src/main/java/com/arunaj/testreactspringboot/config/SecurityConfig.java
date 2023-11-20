@@ -46,9 +46,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 // skip auth for public api
                 .authorizeRequests().antMatchers("/api/public/*", "/h2-console/**").permitAll()
-//                .antMatchers("/tickets/list/").hasAuthority("ADMIN")
+                // api requiring auth and roles
+                .antMatchers("/tickets/list/").hasAuthority("ADMIN")
 //                .antMatchers("/").hasAuthority("USER")
-                .antMatchers("/list/**").access("hasAuthority('ADMIN') or hasPermission(#id, 'com.arunaj.testreactspringboot.model.Ticket', 'READ')")
+                .antMatchers("tickets/list/{id}").hasAnyAuthority("USER", "ADMIN")
                 .antMatchers("/tickets/create", "/tickets/edit/*", "/tickets/list/my").hasAnyAuthority("USER", "ADMIN")
                 // auth all other requests
                 .anyRequest().authenticated()

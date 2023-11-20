@@ -67,13 +67,18 @@ public class TicketController {
         }
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     @GetMapping("/list/{id}")
     public ResponseEntity<?> getTicketById(@PathVariable long id) {
         try {
             Optional<Ticket> ticket = ticketService.getTicketById(id);
+
             if(ticket.isPresent()) {
-                return new ResponseEntity<>(ticket, HttpStatus.OK);
+                // check if user is authorized to access the ticket
+                if(ticketService.checkTicketAccess(ticket.get())) {
+                    return new ResponseEntity<>(ticket, HttpStatus.OK);
+                }
+                return new ResponseEntity<>("You don't have access to this ticket.", HttpStatus.FORBIDDEN);
             }
             else {
                 return new ResponseEntity<>("No ticket exists with the ID " + id, HttpStatus.NOT_FOUND);

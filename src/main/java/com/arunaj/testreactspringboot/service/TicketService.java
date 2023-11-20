@@ -3,23 +3,21 @@ package com.arunaj.testreactspringboot.service;
 import com.arunaj.testreactspringboot.dto.TicketPatchDTO;
 import com.arunaj.testreactspringboot.exception.TicketNotFoundException;
 import com.arunaj.testreactspringboot.model.Account;
+import com.arunaj.testreactspringboot.model.AccountRole;
 import com.arunaj.testreactspringboot.model.Ticket;
 import com.arunaj.testreactspringboot.repository.TicketRepository;
 import com.arunaj.testreactspringboot.util.LoggerUtil;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class TicketService implements PermissionEvaluator {
+public class TicketService {
     private static final Logger logger = LoggerUtil.getLogger(TicketService.class);
     @Autowired
     private TicketRepository ticketRepository;
@@ -59,40 +57,32 @@ public class TicketService implements PermissionEvaluator {
 
     public List<Ticket> getAllTicketsOfCurrentLoggedInUser() throws Exception {
         Optional<Account> account = accountService.getCurrentLoggedInUser();
-        if(account.isPresent())
+        if(account.isPresent()) {
+            logger.info("retrieved all tickets created by current logged-in user");
             return ticketRepository.findTicketsByAccount_Id(account.get().getId());
+        }
         else
             throw new Exception("current logged-in user returned null, cannot fetch ticket list without valid user");
 
     }
 
+    public boolean checkTicketAccess(Ticket ticket) throws Exception {
+        if(accountService.getCurrentLoggedInUser().isPresent()) {
+            if(!accountService.getCurrentLoggedInUser().get().getRole().equals(AccountRole.ADMIN)) {
+                Long currentAccountId = accountService.getCurrentLoggedInUser().get().getId();
+                return checkAccessOfTicketIdByAccountId(ticket.getId(), currentAccountId);
+            }
+            // admin has access to all tickets
+            return true;
+        }
+        else {
+            throw new Exception("cannot check ticket access of user due to error while fetching current logged-in user");
+        }
+    }
+
     public boolean checkAccessOfTicketIdByAccountId(Long ticketId, Long accountId) {
         Optional<Ticket> ticket = ticketRepository.findById(ticketId);
-        if(ticket.isPresent()) {
-            return Objects.equals(ticket.get().getAccount().getId(), accountId);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        if (targetDomainObject instanceof Ticket ticket && "READ".equals(permission)) {
-            Long accountId;
-            try {
-                accountId = accountService.getCurrentLoggedInUser().get().getId();
-            }
-            catch (Exception e) {
-                logger.error("Error fetching current logged-in user:", e);
-                return false;
-            }
-            return checkAccessOfTicketIdByAccountId(ticket.getId(), accountId);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-        return false;
+        return ticket.filter(value -> Objects.equals(value.getAccount().getId(), accountId)).isPresent();
     }
 
     public Optional<Ticket> getTicketById(long id) {
