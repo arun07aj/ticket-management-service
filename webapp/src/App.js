@@ -1,6 +1,7 @@
 // App.js
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import Home from './components/Home';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
@@ -13,7 +14,8 @@ const App = () => {
 
     useEffect(() => {
         // Check if the user is authenticated
-        const token = localStorage.getItem('jwtToken');
+        // Retrieve the JWT token from the cookie
+        const token = Cookies.get('jwtToken');
         if (token) {
             // Additional validation can be performed here if needed
             setAuthenticated(true);
