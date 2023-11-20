@@ -38,7 +38,7 @@ const App = () => {
                 />
                 <Route
                     path="/dashboard"
-                    element={authenticated ? <Dashboard /> : <Navigate to="/login" />}
+                    element={authenticated ? <Dashboard setAuthenticated={setAuthenticated} /> : <Navigate to="/login" />}
                 />
                 <Route
                     path="/create"
