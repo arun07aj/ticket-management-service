@@ -3,10 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import DOMPurify from 'dompurify';
+import Cookies from 'js-cookie';
 import './ViewTicket.css';
 
 const ViewTicket = () => {
     const { id } = useParams();
+    // Retrieve the JWT token from the cookie
+    const jwtToken = Cookies.get('jwtToken');
 
     const [ticketDetails, setTicketDetails] = useState(null);
     const [comments, setComments] = useState('');
@@ -14,7 +17,7 @@ const ViewTicket = () => {
     const [message, setMessage] = useState('');
 
     useEffect(() => {
-        axios.get(`/tickets/list/${id}`)
+        axios.get(`/tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}})
             .then(response => setTicketDetails(response.data))
             .catch(error => {
                 console.error('Error fetching ticket details:', error);
@@ -36,10 +39,10 @@ const ViewTicket = () => {
 
         try {
             // Call the backend API to update the ticket with new comments
-            await axios.patch(`/tickets/edit/${id}`, { updatedDescription: sanitizedDesc });
+            await axios.patch(`/tickets/edit/${id}`,{ updatedDescription: sanitizedDesc }, {headers: {Authorization: `Bearer ${jwtToken}`}});
 
             // Refresh ticket details after update
-            const response = await axios.get(`/tickets/list/${id}`);
+            const response = await axios.get(`/tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}});
             setTicketDetails(response.data);
 
             // Clear the comments textbox
