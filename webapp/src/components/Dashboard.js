@@ -1,20 +1,27 @@
-import React from 'react';
-import {Link, useNavigate} from 'react-router-dom';
-import Cookies from 'js-cookie';
-import './Dashboard.css'; // Import the CSS file
+import React, {useEffect, useState} from 'react';
+import {Link} from 'react-router-dom';
+import './Dashboard.css';
+import useLogout from '../hooks/useLogout';
+import LogoutPopup from './LogoutPopup';
 
 function Dashboard({ setAuthenticated }) {
-    const navigate = useNavigate();
+    const { handleLogout, setLogoutCallback } = useLogout({ setAuthenticated });
+    const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
-    const handleLogout = () => {
-        // Clear the authentication token
-        Cookies.remove('jwtToken');
+    useEffect(() => {
+        // Set the callback function in the useLogout hook
+        setLogoutCallback(() => {
+            // When the callback is triggered, show the logout popup
+            setShowLogoutPopup(true);
+        });
+    }, [setLogoutCallback]);
 
-        // Set the authentication state to false
-        setAuthenticated(false);
+    const closeLogoutPopup = () => {
+        // Close the logout popup
+        setShowLogoutPopup(false);
 
-        // Redirect to the login page upon logout
-        navigate('/login');
+        // Perform the actual logout
+        handleLogout();
     };
 
     return (
@@ -27,6 +34,7 @@ function Dashboard({ setAuthenticated }) {
                 <button>View My Tickets</button>
             </Link>
             <button onClick={handleLogout}>Logout</button>
+            {showLogoutPopup && <LogoutPopup onClose={closeLogoutPopup} />}
         </div>
     );
 }

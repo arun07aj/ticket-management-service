@@ -1,14 +1,35 @@
 // TicketForm.js
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import DOMPurify from 'dompurify';
 import Cookies from 'js-cookie';
 import './TicketForm.css';
+import useLogout from '../hooks/useLogout';
+import LogoutPopup from './LogoutPopup';
 
-const TicketForm = () => {
+const TicketForm = ({setAuthenticated}) => {
     const [subject, setSubject] = useState('');
     const [description, setDescription] = useState('');
     const [message, setMessage] = useState('');
+
+    const { handleLogout, setLogoutCallback } = useLogout({ setAuthenticated });
+    const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+
+    useEffect(() => {
+        // Set the callback function in the useLogout hook
+        setLogoutCallback(() => {
+            // When the callback is triggered, show the logout popup
+            setShowLogoutPopup(true);
+        });
+    }, [setLogoutCallback]);
+
+    const closeLogoutPopup = () => {
+        // Close the logout popup
+        setShowLogoutPopup(false);
+
+        // Perform the actual logout
+        handleLogout();
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -75,6 +96,7 @@ const TicketForm = () => {
                 </button>
             </form>
             <p className="message">{message}</p>
+            {showLogoutPopup && <LogoutPopup onClose={closeLogoutPopup} />}
         </div>
     );
 };

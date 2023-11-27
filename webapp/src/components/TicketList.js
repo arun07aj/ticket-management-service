@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import useLogout from '../hooks/useLogout';
+import LogoutPopup from './LogoutPopup';
 import './TicketList.css';
 
-const TicketList = () => {
+const TicketList = ({setAuthenticated}) => {
     const [tickets, setTickets] = useState([]);
     // Retrieve the JWT token from the cookie
     const jwtToken = Cookies.get('jwtToken');
@@ -16,6 +18,25 @@ const TicketList = () => {
             .then(response => setTickets(response.data))
             .catch(error => console.error('Error fetching tickets:', error));
     }, []);
+
+    const { handleLogout, setLogoutCallback } = useLogout({ setAuthenticated });
+    const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+
+    useEffect(() => {
+        // Set the callback function in the useLogout hook
+        setLogoutCallback(() => {
+            // When the callback is triggered, show the logout popup
+            setShowLogoutPopup(true);
+        });
+    }, [setLogoutCallback]);
+
+    const closeLogoutPopup = () => {
+        // Close the logout popup
+        setShowLogoutPopup(false);
+
+        // Perform the actual logout
+        handleLogout();
+    };
 
     return (
         <div className="ticket-list-container">
@@ -44,6 +65,7 @@ const TicketList = () => {
                 ))}
                 </tbody>
             </table>
+            {showLogoutPopup && <LogoutPopup onClose={closeLogoutPopup} />}
         </div>
     );
 };

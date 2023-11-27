@@ -4,9 +4,11 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import DOMPurify from 'dompurify';
 import Cookies from 'js-cookie';
+import useLogout from '../hooks/useLogout';
+import LogoutPopup from './LogoutPopup';
 import './ViewTicket.css';
 
-const ViewTicket = () => {
+const ViewTicket = ({ setAuthenticated }) => {
     const { id } = useParams();
     // Retrieve the JWT token from the cookie
     const jwtToken = Cookies.get('jwtToken');
@@ -15,6 +17,25 @@ const ViewTicket = () => {
     const [comments, setComments] = useState('');
     const [error, setError] = useState(null);
     const [message, setMessage] = useState('');
+
+    const { handleLogout, setLogoutCallback } = useLogout({ setAuthenticated });
+    const [showLogoutPopup, setShowLogoutPopup] = useState(false);
+
+    useEffect(() => {
+        // Set the callback function in the useLogout hook
+        setLogoutCallback(() => {
+            // When the callback is triggered, show the logout popup
+            setShowLogoutPopup(true);
+        });
+    }, [setLogoutCallback]);
+
+    const closeLogoutPopup = () => {
+        // Close the logout popup
+        setShowLogoutPopup(false);
+
+        // Perform the actual logout
+        handleLogout();
+    };
 
     useEffect(() => {
         axios.get(`/tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}})
@@ -83,6 +104,7 @@ const ViewTicket = () => {
                 <button type="submit">Submit</button>
             </form>
             <p className="message">{message}</p>
+            {showLogoutPopup && <LogoutPopup onClose={closeLogoutPopup} />}
         </div>
     );
 };

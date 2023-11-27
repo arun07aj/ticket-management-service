@@ -42,13 +42,13 @@ const App = () => {
                 />
                 <Route
                     path="/create"
-                    element={authenticated ? <TicketForm /> : <Navigate to="/login" />}
+                    element={authenticated ? <TicketForm setAuthenticated={setAuthenticated} /> : <Navigate to="/login" />}
                 />
                 <Route
                     path="/view"
-                    element={authenticated ? <TicketList /> : <Navigate to="/login" />}
+                    element={authenticated ? <TicketList setAuthenticated={setAuthenticated} /> : <Navigate to="/login" />}
                 />
-                <Route path="/tickets/:id" element={authenticated ? <ViewTicket /> : <Navigate to="/login" />} />
+                <Route path="/tickets/:id" element={authenticated ? <ViewTicket setAuthenticated={setAuthenticated} /> : <Navigate to="/login" />} />
             </Routes>
         </Router>
     );
