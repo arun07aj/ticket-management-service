@@ -1,6 +1,9 @@
 package com.arunaj.testreactspringboot.controller;
 
 import com.arunaj.testreactspringboot.dto.UserLoginDTO;
+import com.arunaj.testreactspringboot.dto.UserSignupDTO;
+import com.arunaj.testreactspringboot.exception.AccountAlreadyExistsException;
+import com.arunaj.testreactspringboot.exception.BadRequestException;
 import com.arunaj.testreactspringboot.model.Account;
 import com.arunaj.testreactspringboot.service.AccountService;
 import com.arunaj.testreactspringboot.util.JwtUtil;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.management.BadAttributeValueExpException;
 import java.util.Optional;
 
 @RestController
@@ -52,6 +56,23 @@ public class PublicController {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
+        }
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody UserSignupDTO signupDTO) throws Exception {
+        try{
+            return accountService.createAccount(signupDTO);
+        }
+        catch(BadRequestException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        catch(AccountAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+        catch(Exception e){
+            logger.error("Failed to create account: " + e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating account at the moment");
         }
     }
 

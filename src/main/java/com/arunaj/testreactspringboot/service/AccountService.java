@@ -1,10 +1,16 @@
 package com.arunaj.testreactspringboot.service;
 
+import com.arunaj.testreactspringboot.dto.UserSignupDTO;
+import com.arunaj.testreactspringboot.exception.AccountAlreadyExistsException;
+import com.arunaj.testreactspringboot.exception.BadRequestException;
 import com.arunaj.testreactspringboot.model.Account;
+import com.arunaj.testreactspringboot.model.AccountRole;
 import com.arunaj.testreactspringboot.repository.AccountRepository;
 import com.arunaj.testreactspringboot.util.LoggerUtil;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -13,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.management.BadAttributeValueExpException;
 import java.util.Optional;
 
 @Service
@@ -45,4 +52,58 @@ public class AccountService implements UserDetailsService {
         logger.warn("current logged-in user could not be identified");
         return Optional.empty();
     }
+
+    public ResponseEntity<?> createAccount(UserSignupDTO signupDTO){
+        if (signupDTO.getUsername() == null || signupDTO.getUsername().isBlank() ||
+                signupDTO.getEmail() == null || signupDTO.getEmail().isBlank() ||
+                signupDTO.getPassword() == null || signupDTO.getPassword().isBlank()) {
+            throw new BadRequestException("One or more mandatory field(s) are missing");
+        }
+        else if(!isValidEmail(signupDTO.getEmail())) {
+            throw new BadRequestException("Email provided is not valid");
+        }
+        else{
+            if (!accountRepository.findAccountByEmail(signupDTO.getEmail()).isPresent()) {
+                if (!accountRepository.findAccountByUsername(signupDTO.getUsername()).isPresent()) {
+                    Account account = new Account(signupDTO.getUsername(), signupDTO.getEmail(), signupDTO.getPassword());
+                    account.setRole(AccountRole.USER);
+                    account.setActive(true);
+                    accountRepository.save(account);
+
+                    long createdID = accountRepository.findAccountByUsername(signupDTO.getUsername())
+                            .orElseThrow(() -> new IllegalStateException("Account not found after saving"))
+                            .getId();
+
+                    return ResponseEntity.status(HttpStatus.CREATED).body("User created with ID: #" + createdID);
+                }
+                throw new AccountAlreadyExistsException("user already exists with the username: " + signupDTO.getUsername());
+            }
+            throw new AccountAlreadyExistsException("user already exists with the email: " + signupDTO.getEmail());
+        }
+
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        if (!email.matches(emailRegex)) {
+            return false; // Email format is not valid
+        }
+
+        // Extracting domain from the email
+        String[] emailParts = email.split("@");
+        String domain = emailParts[1].toLowerCase();
+
+        // List of supported domains
+        String[] supportedDomains = {"arunaj.co", "gmail.com", "outlook.com"};
+
+        // Check if the domain is in the supported list
+        for (String supportedDomain : supportedDomains) {
+            if (domain.equals(supportedDomain)) {
+                return true;
+            }
+        }
+
+        throw new BadRequestException("Email domain is not supported, please provide either Gmail / Outlook");
+    }
+
 }
