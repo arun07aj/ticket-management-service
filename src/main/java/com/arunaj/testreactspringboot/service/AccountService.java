@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -64,7 +65,8 @@ public class AccountService implements UserDetailsService {
         else{
             if (!accountRepository.findAccountByEmail(signupDTO.getEmail()).isPresent()) {
                 if (!accountRepository.findAccountByUsername(signupDTO.getUsername()).isPresent()) {
-                    Account account = new Account(signupDTO.getUsername(), signupDTO.getEmail(), signupDTO.getPassword());
+                    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                    Account account = new Account(signupDTO.getUsername(), signupDTO.getEmail(), passwordEncoder.encode(signupDTO.getPassword()));
                     account.setRole(AccountRole.USER);
                     account.setActive(true);
                     accountRepository.save(account);
