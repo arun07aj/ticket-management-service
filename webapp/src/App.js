@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard';
 import TicketForm from './components/TicketForm';
 import TicketList from './components/TicketList';
 import ViewTicket from './components/ViewTicket';
+import SignupForm from './components/SignupForm';
 
 const App = () => {
     const [authenticated, setAuthenticated] = useState(false);
@@ -26,6 +27,7 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/signup" element={<SignupForm />} />
                 <Route
                     path="/login"
                     element={
