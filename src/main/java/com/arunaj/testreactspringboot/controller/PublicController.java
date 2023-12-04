@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.Optional;
 
 @RestController
@@ -60,7 +59,7 @@ public class PublicController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserSignupDTO signupDTO) throws Exception {
+    public ResponseEntity<?> signup(@RequestBody UserSignupDTO signupDTO) {
         try{
             return accountService.createAccount(signupDTO);
         }
