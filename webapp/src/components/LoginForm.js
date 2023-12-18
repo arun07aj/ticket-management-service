@@ -36,7 +36,7 @@ const LoginForm = ({ setAuthenticated }) => {
             const token = response.data;
 
             // Store the token in a secure cookie
-            Cookies.set('jwtToken', token, { secure: true, sameSite: 'strict' });
+            Cookies.set('jwtToken', token, { secure: true, sameSite: 'None' });
 
             // Set the authentication state
             setAuthenticated(true);

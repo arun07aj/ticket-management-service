@@ -8,7 +8,7 @@ const useLogout = ({ setAuthenticated }) => {
     let logoutCallback = null;
     const handleLogout = () => {
         // Clear the authentication token
-        Cookies.remove('jwtToken');
+        Cookies.remove('jwtToken', { sameSite: 'None', secure: true });
 
         // Set the authentication state to false
         setAuthenticated(false);
