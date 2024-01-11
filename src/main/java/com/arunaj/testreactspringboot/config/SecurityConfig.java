@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +35,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private CustomAccessDeniedHandler accessDeniedHandler;
 
     @Autowired
+    private CorsConfig corsConfig;
+    @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(accountService).passwordEncoder(new BCryptPasswordEncoder());
         logger.info("authentication manager build completed");
@@ -44,12 +47,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf()
                 .disable()
+                .cors()
+                .and()
+                .addFilterBefore(corsConfig.corsFilter(), CorsFilter.class)
                 // skip auth for public api
                 .authorizeRequests().antMatchers("/api/public/*", "/h2-console/**").permitAll()
                 // api requiring auth and roles
                 .antMatchers("/tickets/list/").hasAuthority("ADMIN")
-//                .antMatchers("/").hasAuthority("USER")
-                .antMatchers("tickets/list/{id}").hasAnyAuthority("USER", "ADMIN")
+                .antMatchers("/tickets/list/{id}").hasAnyAuthority("USER", "ADMIN")
                 .antMatchers("/tickets/create", "/tickets/edit/*", "/tickets/list/my").hasAnyAuthority("USER", "ADMIN")
                 // auth all other requests
                 .anyRequest().authenticated()
@@ -60,7 +65,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
                 .and()
                 // if stateful then no auth until its expiry
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .headers().frameOptions().disable();
 
         http.headers().frameOptions().sameOrigin();
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

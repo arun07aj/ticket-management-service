@@ -17,6 +17,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"https://arunaj.co", "http://arunaj.co", "http://localhost:3000"})
 @RequestMapping("/api/public")
 public class PublicController {
     private static final Logger logger = LoggerUtil.getLogger(PublicController.class);
@@ -75,6 +76,11 @@ public class PublicController {
             logger.error("Failed to create account: " + e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating account at the moment");
         }
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<?> testHealth() {
+        return ResponseEntity.status(HttpStatus.OK).body("TMS says HI..!");
     }
 
 }
