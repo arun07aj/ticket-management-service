@@ -26,8 +26,11 @@ const LoginForm = ({ setAuthenticated }) => {
             const sanitizedUsername = DOMPurify.sanitize(username);
             const sanitizedPassword = DOMPurify.sanitize(password);
 
+            // Get the base URL from the environment variable
+            const baseURL = process.env.REACT_APP_API_BASE_URL;
+
             // Make API call to login endpoint
-            const response = await axios.post('/api/public/login', {
+            const response = await axios.post(`${baseURL}api/public/login`, {
                 username: sanitizedUsername,
                 password: sanitizedPassword
             });

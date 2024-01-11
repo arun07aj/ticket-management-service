@@ -21,6 +21,9 @@ const ViewTicket = ({ setAuthenticated }) => {
     const { handleLogout, setLogoutCallback } = useLogout({ setAuthenticated });
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
 
+    // Get the base URL from the environment variable
+    const baseURL = process.env.REACT_APP_API_BASE_URL;
+
     useEffect(() => {
         // Set the callback function in the useLogout hook
         setLogoutCallback(() => {
@@ -38,7 +41,7 @@ const ViewTicket = ({ setAuthenticated }) => {
     };
 
     useEffect(() => {
-        axios.get(`/tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}})
+        axios.get(`${baseURL}tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}})
             .then(response => setTicketDetails(response.data))
             .catch(error => {
                 console.error('Error fetching ticket details:', error);
@@ -60,10 +63,10 @@ const ViewTicket = ({ setAuthenticated }) => {
 
         try {
             // Call the backend API to update the ticket with new comments
-            await axios.patch(`/tickets/edit/${id}`,{ updatedDescription: sanitizedDesc }, {headers: {Authorization: `Bearer ${jwtToken}`}});
+            await axios.patch(`${baseURL}tickets/edit/${id}`,{ updatedDescription: sanitizedDesc }, {headers: {Authorization: `Bearer ${jwtToken}`}});
 
             // Refresh ticket details after update
-            const response = await axios.get(`/tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}});
+            const response = await axios.get(`${baseURL}tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}});
             setTicketDetails(response.data);
 
             // Clear the comments textbox
@@ -89,7 +92,7 @@ const ViewTicket = ({ setAuthenticated }) => {
             <div className="ticket-details">
                 <p><strong>Subject:</strong> {ticketDetails.subject}</p>
                 <p><strong>Created Time:</strong> {ticketDetails.createdDate} | <strong>Status:</strong> {ticketDetails.status}</p>
-                <p><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></p>
+                <div><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></div>
             </div>
 
             <form className="comment-form" onSubmit={handleCommentSubmit}>

@@ -19,7 +19,10 @@ const SignupForm = () => {
             const sanitizedUsername = sanitizeInput(username);
             const sanitizedPassword = sanitizeInput(password);
 
-            const response = await axios.post('/api/public/signup', {
+            // Get the base URL from the environment variable
+            const baseURL = process.env.REACT_APP_API_BASE_URL;
+
+            const response = await axios.post(`${baseURL}api/public/signup`, {
                 email: sanitizedEmail,
                 username: sanitizedUsername,
                 password: sanitizedPassword

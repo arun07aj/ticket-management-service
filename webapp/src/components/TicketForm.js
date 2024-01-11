@@ -48,8 +48,11 @@ const TicketForm = ({setAuthenticated}) => {
             // Retrieve the JWT token from the cookie
             const jwtToken = Cookies.get('jwtToken');
 
+            // Get the base URL from the environment variable
+            const baseURL = process.env.REACT_APP_API_BASE_URL;
+
             // Call the createTicket API
-            const response = await axios.post('/tickets/create',
+            const response = await axios.post(`${baseURL}tickets/create`,
                 { subject: sanitizedSubject, description: sanitizedDescription },
                 {headers: {Authorization: `Bearer ${jwtToken}`}});
 

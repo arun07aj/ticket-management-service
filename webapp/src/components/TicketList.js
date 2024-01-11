@@ -12,9 +12,12 @@ const TicketList = ({setAuthenticated}) => {
     // Retrieve the JWT token from the cookie
     const jwtToken = Cookies.get('jwtToken');
 
+    // Get the base URL from the environment variable
+    const baseURL = process.env.REACT_APP_API_BASE_URL;
+
     useEffect(() => {
         // Fetch tickets from the /list API endpoint
-        axios.get('/tickets/list/my', {headers: {Authorization: `Bearer ${jwtToken}`}})
+        axios.get(`${baseURL}tickets/list/my`, {headers: {Authorization: `Bearer ${jwtToken}`}})
             .then(response => setTickets(response.data))
             .catch(error => console.error('Error fetching tickets:', error));
     }, []);
