@@ -10,10 +10,10 @@
     </parent>
     <packaging>jar</packaging>
     <groupId>com.arunaj</groupId>
-    <artifactId>testreactspringboot</artifactId>
+    <artifactId>tms</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>testreactspringboot</name>
-    <description>testreactspringboot</description>
+    <name>Ticket Management Service</name>
+    <description>A full stack application powered by Springboot and React for ticket management service.</description>
     <properties>
         <java.version>17</java.version>
     </properties>
