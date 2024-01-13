@@ -24,7 +24,7 @@ const App = () => {
     }, []);
 
     return (
-        <Router>
+        <Router basename="/tmsapp">
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/signup" element={<SignupForm />} />
