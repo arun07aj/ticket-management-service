@@ -1,7 +1,6 @@
 // App.js
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import Home from './components/Home';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
@@ -9,19 +8,12 @@ import TicketForm from './components/TicketForm';
 import TicketList from './components/TicketList';
 import ViewTicket from './components/ViewTicket';
 import SignupForm from './components/SignupForm';
+import useAuthentication from "./hooks/useAuthentication";
 
 const App = () => {
     const [authenticated, setAuthenticated] = useState(false);
 
-    useEffect(() => {
-        // Check if the user is authenticated
-        // Retrieve the JWT token from the cookie
-        const token = Cookies.get('jwtToken');
-        if (token) {
-            // Additional validation can be performed here if needed
-            setAuthenticated(true);
-        }
-    }, []);
+    useAuthentication(setAuthenticated);
 
     return (
         <Router basename="/tmsapp">
