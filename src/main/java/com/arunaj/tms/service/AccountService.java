@@ -53,6 +53,15 @@ public class AccountService implements UserDetailsService {
         return Optional.empty();
     }
 
+    public AccountRole getCurrentLoggedInUserRole() {
+        Optional<Account> currentUser = getCurrentLoggedInUser();
+        if(currentUser.isPresent()) {
+            return currentUser.get().getRole();
+        }
+        logger.warn("role of current logged-in user could not be identified");
+        return null;
+    }
+
     public ResponseEntity<?> createAccount(UserSignupDTO signupDTO){
         if (signupDTO.getUsername() == null || signupDTO.getUsername().isBlank() ||
                 signupDTO.getEmail() == null || signupDTO.getEmail().isBlank() ||
