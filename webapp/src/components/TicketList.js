@@ -15,12 +15,36 @@ const TicketList = ({setAuthenticated}) => {
     // Get the base URL from the environment variable
     const baseURL = process.env.REACT_APP_API_BASE_URL;
 
+    const [userRole, setUserRole] = useState(null);
+
+    // Fetch user role when the component mounts
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            await axios.get(`${baseURL}users/role`, {headers: {Authorization: `Bearer ${jwtToken}`}})
+                .then(response => {
+                    setUserRole(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching user role:', error);
+                });
+        };
+
+        fetchUserRole();
+    }, [baseURL, jwtToken]);
+
     useEffect(() => {
         // Fetch tickets from the /list API endpoint
-        axios.get(`${baseURL}tickets/list/my`, {headers: {Authorization: `Bearer ${jwtToken}`}})
-            .then(response => setTickets(response.data))
-            .catch(error => console.error('Error fetching tickets:', error));
-    }, []);
+        if(userRole === 'USER') {
+            axios.get(`${baseURL}tickets/list/my`, {headers: {Authorization: `Bearer ${jwtToken}`}})
+                .then(response => setTickets(response.data))
+                .catch(error => console.error('Error fetching tickets:', error));
+        }
+        else if(userRole === 'ADMIN') {
+            axios.get(`${baseURL}tickets/list`, {headers: {Authorization: `Bearer ${jwtToken}`}})
+                .then(response => setTickets(response.data))
+                .catch(error => console.error('Error fetching tickets:', error));
+        }
+    }, [baseURL, jwtToken, userRole]);
 
     const { handleLogout, setLogoutCallback } = useLogout({ setAuthenticated });
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
@@ -43,7 +67,7 @@ const TicketList = ({setAuthenticated}) => {
 
     return (
         <div className="ticket-list-container">
-            <h2 className="table-title">My Tickets</h2>
+            <h2 className="table-title">Tickets</h2>
             <table className="ticket-table">
                 <thead>
                 <tr>
