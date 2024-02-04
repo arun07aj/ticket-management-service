@@ -91,6 +91,7 @@ const ViewTicket = ({ setAuthenticated }) => {
             <h1 style={{ textAlign: 'center' }}>{`View Ticket #${ticketDetails.id}`}</h1>
             <div className="ticket-details">
                 <p><strong>Subject:</strong> {ticketDetails.subject}</p>
+                <p><strong>Ticket Raised By:</strong> {ticketDetails.creatorEmail}</p>
                 <p><strong>Created Time:</strong> {ticketDetails.createdDate} | <strong>Status:</strong> {ticketDetails.status}</p>
                 <div><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></div>
             </div>

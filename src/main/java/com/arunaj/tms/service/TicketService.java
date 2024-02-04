@@ -1,5 +1,6 @@
 package com.arunaj.tms.service;
 
+import com.arunaj.tms.dto.TicketDetailsDTO;
 import com.arunaj.tms.dto.TicketPatchDTO;
 import com.arunaj.tms.exception.TicketNotFoundException;
 import com.arunaj.tms.model.Account;
@@ -51,22 +52,22 @@ public class TicketService {
                 ticket.getSubject() != null && !ticket.getSubject().isEmpty();
     }
 
-    public List<Ticket> getAllTickets() {
-        return ticketRepository.findAll();
+    public List<TicketDetailsDTO> getAllTickets() {
+        return ticketRepository.findAllTicketDetailsDTO();
     }
 
-    public List<Ticket> getAllTicketsOfCurrentLoggedInUser() throws Exception {
+    public List<TicketDetailsDTO> getAllTicketsOfCurrentLoggedInUser() throws Exception {
         Optional<Account> account = accountService.getCurrentLoggedInUser();
         if(account.isPresent()) {
             logger.info("retrieved all tickets created by current logged-in user");
-            return ticketRepository.findTicketsByAccount_Id(account.get().getId());
+            return ticketRepository.findAllTicketDetailsDTOByAccountId(account.get().getId());
         }
         else
             throw new Exception("current logged-in user returned null, cannot fetch ticket list without valid user");
 
     }
 
-    public boolean checkTicketAccess(Ticket ticket) throws Exception {
+    public boolean checkTicketAccess(TicketDetailsDTO ticket) throws Exception {
         if(accountService.getCurrentLoggedInUser().isPresent()) {
             if(!accountService.getCurrentLoggedInUser().get().getRole().equals(AccountRole.ADMIN)) {
                 Long currentAccountId = accountService.getCurrentLoggedInUser().get().getId();
@@ -85,11 +86,11 @@ public class TicketService {
         return ticket.filter(value -> Objects.equals(value.getAccount().getId(), accountId)).isPresent();
     }
 
-    public Optional<Ticket> getTicketById(long id) {
-        return ticketRepository.findById(id);
+    public Optional<TicketDetailsDTO> getTicketById(long id) {
+        return ticketRepository.findTicketDetailsDTOById(id);
     }
 
-    public Ticket updateTicket(long id, TicketPatchDTO ticketPatchDTO) {
+    public TicketDetailsDTO updateTicket(long id, TicketPatchDTO ticketPatchDTO) {
         Ticket existingTicket = ticketRepository.findById(id)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found for ID: " + id));
 
@@ -110,7 +111,9 @@ public class TicketService {
             existingTicket.setStatus("OPEN");
         }
 
-        return ticketRepository.save(existingTicket);
+        ticketRepository.save(existingTicket);
+
+        return ticketRepository.findTicketDetailsDTOById(id).get();
     }
 
 }

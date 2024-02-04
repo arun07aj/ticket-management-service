@@ -72,6 +72,7 @@ const TicketList = ({setAuthenticated}) => {
                 <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Creator</th>
                     <th>Subject</th>
                     <th>Created Date</th>
                     <th>Status</th>
@@ -82,6 +83,7 @@ const TicketList = ({setAuthenticated}) => {
                 {tickets.map((ticket) => (
                     <tr key={ticket.id}>
                         <td>{ticket.id}</td>
+                        <td>{ticket.creatorEmail}</td>
                         <td>{ticket.subject}</td>
                         <td>{ticket.createdDate}</td>
                         <td>{ticket.status}</td>
