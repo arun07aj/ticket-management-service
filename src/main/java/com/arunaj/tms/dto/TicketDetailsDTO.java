@@ -1,6 +1,9 @@
 package com.arunaj.tms.dto;
 
+import com.arunaj.tms.model.Comment;
+
 import java.util.Date;
+import java.util.List;
 
 public class TicketDetailsDTO {
     private Long id;
@@ -10,6 +13,7 @@ public class TicketDetailsDTO {
     private Date lastUpdatedDate;
     private String status;
     private String creatorEmail;
+    private List<Comment> comments;
 
     public TicketDetailsDTO(Long id, String subject, String description, Date createdDate, Date lastUpdatedDate, String status, String creatorEmail) {
         this.id = id;
@@ -75,5 +79,13 @@ public class TicketDetailsDTO {
 
     public void setCreatorEmail(String creatorEmail) {
         this.creatorEmail = creatorEmail;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

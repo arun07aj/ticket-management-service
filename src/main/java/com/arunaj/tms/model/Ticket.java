@@ -1,7 +1,9 @@
 package com.arunaj.tms.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -9,7 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Ticket {
@@ -28,13 +32,17 @@ public class Ticket {
     @JsonBackReference
     private Account account;
 
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Comment> comments;
+
     // Constructors, getters, and setters
 
     public Ticket() {
         // Default constructor
     }
 
-    public Ticket(Long id, String subject, String description, Date createdDate, Date lastUpdatedDate, String status, Account account) {
+    public Ticket(Long id, String subject, String description, Date createdDate, Date lastUpdatedDate, String status, Account account, List<Comment> comments) {
         this.id = id;
         this.subject = subject;
         this.description = description;
@@ -42,6 +50,7 @@ public class Ticket {
         this.lastUpdatedDate = lastUpdatedDate;
         this.status = status;
         this.account = account;
+        this.comments = comments;
     }
 
     // Getters and setters
@@ -98,5 +107,13 @@ public class Ticket {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }
