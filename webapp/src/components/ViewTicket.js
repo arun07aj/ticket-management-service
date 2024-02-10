@@ -53,17 +53,17 @@ const ViewTicket = ({ setAuthenticated }) => {
         e.preventDefault();
 
         // Sanitize user input using DOMPurify
-        const sanitizedDesc = DOMPurify.sanitize(comments);
+        const sanitizedComment = DOMPurify.sanitize(comments);
 
         // Check if sanitized description is  not null or empty
-        if (!sanitizedDesc) {
+        if (!sanitizedComment) {
             setMessage('Comment cannot be empty.');
             return;
         }
 
         try {
             // Call the backend API to update the ticket with new comments
-            await axios.patch(`${baseURL}tickets/edit/${id}`,{ updatedDescription: sanitizedDesc }, {headers: {Authorization: `Bearer ${jwtToken}`}});
+            await axios.patch(`${baseURL}tickets/edit/${id}`,{ comment: sanitizedComment }, {headers: {Authorization: `Bearer ${jwtToken}`}});
 
             // Refresh ticket details after update
             const response = await axios.get(`${baseURL}tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}});
@@ -94,6 +94,15 @@ const ViewTicket = ({ setAuthenticated }) => {
                 <p><strong>Ticket Raised By:</strong> {ticketDetails.creatorEmail}</p>
                 <p><strong>Created Time:</strong> {ticketDetails.createdDate} | <strong>Status:</strong> {ticketDetails.status}</p>
                 <div><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></div>
+            </div>
+
+            <div className="comments-section">
+                <p><strong>Comments</strong></p>
+                {ticketDetails.comments.map((comment) => (
+                    <div key={comment.id} className="comment">
+                        <p>{comment.username}: {comment.content} [{comment.commentTime}]</p>
+                    </div>
+                ))}
             </div>
 
             <form className="comment-form" onSubmit={handleCommentSubmit}>
