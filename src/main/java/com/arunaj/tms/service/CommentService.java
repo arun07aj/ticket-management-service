@@ -21,18 +21,21 @@ public class CommentService {
     @Autowired
     private AccountService accountService;
 
-    public Comment addComment(Comment comment, Ticket ticket) throws Exception {
-        if(comment != null) {
-            comment.setCommentTime(new Date(System.currentTimeMillis()));
-            comment.setTicket(ticket);
+    public Comment addComment(String comment, Ticket ticket) throws Exception {
+        Comment commentObj = new Comment();
+        if(comment != null && !comment.isEmpty()) {
+            commentObj.setContent(comment);
+            commentObj.setCommentTime(new Date(System.currentTimeMillis()));
+            commentObj.setTicket(ticket);
             if(accountService.getCurrentLoggedInUser().isPresent()) {
-                comment.setUsername(accountService.getCurrentLoggedInUser().get().getUsername());
+                commentObj.setUsername(accountService.getCurrentLoggedInUser().get().getUsername());
             }
             else
                 throw new Exception("current logged-in user returned null, cannot create ticket without valid user");
         }
-        if(isValidComment(comment)) {
-            return commentRepository.save(comment);
+
+        if(isValidComment(commentObj)) {
+            return commentRepository.save(commentObj);
         }
 
         logger.info("invalid comment received: comment content may be null");

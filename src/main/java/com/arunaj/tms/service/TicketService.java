@@ -145,7 +145,7 @@ public class TicketService {
         }
 
         ticketRepository.save(existingTicket);
-
+        logger.info("edit ticket successful and fetching ticket id: " + id);
         return getTicketById(id).get();
     }
 
