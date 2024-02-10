@@ -2,6 +2,7 @@ package com.arunaj.tms.controller;
 
 import com.arunaj.tms.dto.TicketDetailsDTO;
 import com.arunaj.tms.dto.TicketPatchDTO;
+import com.arunaj.tms.exception.InvalidDataException;
 import com.arunaj.tms.exception.TicketNotFoundException;
 import com.arunaj.tms.model.Ticket;
 import com.arunaj.tms.service.TicketService;
@@ -103,7 +104,12 @@ public class TicketController {
         catch(TicketNotFoundException e) {
             logger.info("No ticket exists with the ID " + id, e);
             return new ResponseEntity<>("No ticket exists with the ID " + id, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
+        }
+        catch(InvalidDataException e) {
+            logger.info("mandatory values may be null, details:", e);
+            return new ResponseEntity<>("mandatory values cannot be null", HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
             logger.error("Error occurred while updating ticket details:", e);
             return new ResponseEntity<>("Error occurred while updating ticket details", HttpStatus.INTERNAL_SERVER_ERROR);
         }

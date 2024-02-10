@@ -20,6 +20,7 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length=256)
     private String subject;
     @Column(length=1024)
     private String description;

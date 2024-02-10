@@ -2,6 +2,7 @@ package com.arunaj.tms.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -16,6 +17,7 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length=1024)
     private String content;
     private Date commentTime;
     private String username;

@@ -2,8 +2,10 @@ package com.arunaj.tms.service;
 
 import com.arunaj.tms.dto.TicketDetailsDTO;
 import com.arunaj.tms.dto.TicketPatchDTO;
+import com.arunaj.tms.exception.InvalidDataException;
 import com.arunaj.tms.exception.TicketNotFoundException;
 import com.arunaj.tms.model.Account;
+import com.arunaj.tms.model.Comment;
 import com.arunaj.tms.model.AccountRole;
 import com.arunaj.tms.model.Ticket;
 import com.arunaj.tms.repository.TicketRepository;
@@ -46,7 +48,8 @@ public class TicketService {
                 return ticketRepository.save(ticket);
             }
         }
-        throw new Exception("invalid ticket");
+        logger.info("invalid ticket received: description or subject may be null");
+        throw new InvalidDataException("invalid ticket");
     }
 
     private boolean isValidTicket(Ticket ticket) {
@@ -113,7 +116,7 @@ public class TicketService {
         return ticket.filter(value -> Objects.equals(value.getAccount().getId(), accountId)).isPresent();
     }
 
-    public TicketDetailsDTO updateTicket(long id, TicketPatchDTO ticketPatchDTO) {
+    public TicketDetailsDTO updateTicket(long id, TicketPatchDTO ticketPatchDTO) throws Exception {
         Ticket existingTicket = ticketRepository.findById(id)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found for ID: " + id));
 
@@ -134,9 +137,16 @@ public class TicketService {
             existingTicket.setStatus("OPEN");
         }
 
+        // add new comment if provided
+        if(ticketPatchDTO.getComment() != null) {
+            List<Comment> comments = existingTicket.getComments();
+            comments.add(commentService.addComment(ticketPatchDTO.getComment(), existingTicket));
+            existingTicket.setComments(comments);
+        }
+
         ticketRepository.save(existingTicket);
 
-        return ticketRepository.findTicketDetailsDTOById(id).get();
+        return getTicketById(id).get();
     }
 
 }
