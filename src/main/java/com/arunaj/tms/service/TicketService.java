@@ -26,6 +26,9 @@ public class TicketService {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private CommentService commentService;
+
     public Ticket createTicket(Ticket ticket) throws Exception {
 
         if(ticket != null) {
@@ -52,19 +55,43 @@ public class TicketService {
                 ticket.getSubject() != null && !ticket.getSubject().isEmpty();
     }
 
+    public Optional<TicketDetailsDTO> getTicketById(long id) {
+        Optional<TicketDetailsDTO> ticketDetailsDTO = ticketRepository.findTicketDetailsDTOById(id);
+        // fetch and set comments for ticket
+        if(ticketDetailsDTO.isPresent()) {
+            ticketDetailsDTO.get().setComments(commentService.fetchAllCommentsOfTicketId(id));
+            logger.info("fetched and set comments for the ticket id: " + id);
+            return ticketDetailsDTO;
+        }
+
+        logger.info("ticket not found for the given id: " + id);
+        return Optional.empty();
+    }
+
     public List<TicketDetailsDTO> getAllTickets() {
-        return ticketRepository.findAllTicketDetailsDTO();
+        return fetchAndSetCommentsForTickets(ticketRepository.findAllTicketDetailsDTO());
+    }
+
+    private List<TicketDetailsDTO> fetchAndSetCommentsForTickets(List<TicketDetailsDTO> ticketDetailsDTOList) {
+        // fetch and set comments for each ticket one by one
+        ticketDetailsDTOList
+                .forEach(ticketDetailsDTO -> {
+                    long ticketId = ticketDetailsDTO.getId();
+                    ticketDetailsDTO.setComments(commentService.fetchAllCommentsOfTicketId(ticketId));
+                });
+        logger.info("fetched and set comments successfully for ticket list");
+        return ticketDetailsDTOList;
     }
 
     public List<TicketDetailsDTO> getAllTicketsOfCurrentLoggedInUser() throws Exception {
         Optional<Account> account = accountService.getCurrentLoggedInUser();
+
         if(account.isPresent()) {
             logger.info("retrieved all tickets created by current logged-in user");
-            return ticketRepository.findAllTicketDetailsDTOByAccountId(account.get().getId());
+            return fetchAndSetCommentsForTickets(ticketRepository.findAllTicketDetailsDTOByAccountId(account.get().getId()));
         }
         else
             throw new Exception("current logged-in user returned null, cannot fetch ticket list without valid user");
-
     }
 
     public boolean checkTicketAccess(TicketDetailsDTO ticket) throws Exception {
@@ -84,10 +111,6 @@ public class TicketService {
     public boolean checkAccessOfTicketIdByAccountId(Long ticketId, Long accountId) {
         Optional<Ticket> ticket = ticketRepository.findById(ticketId);
         return ticket.filter(value -> Objects.equals(value.getAccount().getId(), accountId)).isPresent();
-    }
-
-    public Optional<TicketDetailsDTO> getTicketById(long id) {
-        return ticketRepository.findTicketDetailsDTOById(id);
     }
 
     public TicketDetailsDTO updateTicket(long id, TicketPatchDTO ticketPatchDTO) {
