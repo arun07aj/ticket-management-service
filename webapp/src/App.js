@@ -41,6 +41,7 @@ const App = () => {
                     element={authenticated ? <TicketList setAuthenticated={setAuthenticated} /> : <Navigate to="/login" />}
                 />
                 <Route path="/tickets/:id" element={authenticated ? <ViewTicket setAuthenticated={setAuthenticated} /> : <Navigate to="/login" />} />
+                <Route path="*" element={<ErrorPage />} />
             </Routes>
         </Router>
     );
