@@ -1,5 +1,5 @@
 // App.js
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './components/Home';
 import LoginForm from './components/LoginForm';
@@ -8,13 +8,11 @@ import TicketForm from './components/TicketForm';
 import TicketList from './components/TicketList';
 import ViewTicket from './components/ViewTicket';
 import SignupForm from './components/SignupForm';
+import ErrorPage from './components/ErrorPage';
 import useAuthentication from "./hooks/useAuthentication";
 
 const App = () => {
-    const [authenticated, setAuthenticated] = useState(false);
-
-    useAuthentication(setAuthenticated);
-
+    const [authenticated, setAuthenticated] = useAuthentication();
     return (
         <Router basename="/tmsapp">
             <Routes>
