@@ -44,8 +44,12 @@ const ViewTicket = ({ setAuthenticated }) => {
         axios.get(`${baseURL}tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}})
             .then(response => setTicketDetails(response.data))
             .catch(error => {
-                console.error('Error fetching ticket details:', error);
-                setError(error);
+                if (error.response && error.response.status === 403) {
+                    setError("Sorry, you are not authorized to access the ticket.");
+                } else {
+                    console.error('Error fetching ticket details:', error);
+                    setError("Error loading ticket details. Please try again later.");
+                }
             });
     }, [id]);
 
@@ -79,7 +83,7 @@ const ViewTicket = ({ setAuthenticated }) => {
     };
 
     if (error) {
-        return <div>Error loading ticket details. Please try again later.</div>;
+        return <div>{error}</div>;
     }
 
     if (!ticketDetails) {
