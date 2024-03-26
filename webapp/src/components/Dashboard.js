@@ -31,7 +31,7 @@ function Dashboard({ setAuthenticated }) {
                 <button>Create a New Ticket</button>
             </Link>
             <Link to="/view">
-                <button>View My Tickets</button>
+                <button>View Tickets</button>
             </Link>
             <button onClick={handleLogout}>Logout</button>
             {showLogoutPopup && <LogoutPopup onClose={closeLogoutPopup} />}

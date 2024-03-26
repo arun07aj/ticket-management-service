@@ -3,13 +3,15 @@ package com.arunaj.tms.dto;
 public class TicketPatchDTO {
     private String updatedDescription;
     private String updatedStatus;
+    private String comment;
 
     public TicketPatchDTO() {
     }
 
-    public TicketPatchDTO(String updatedDescription, String updatedStatus) {
+    public TicketPatchDTO(String updatedDescription, String updatedStatus, String comment) {
         this.updatedDescription = updatedDescription;
         this.updatedStatus = updatedStatus;
+        this.comment = comment;
     }
 
     public String getUpdatedDescription() {
@@ -26,5 +28,13 @@ public class TicketPatchDTO {
 
     public void setUpdatedStatus(String updatedStatus) {
         this.updatedStatus = updatedStatus;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

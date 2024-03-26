@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import Cookies from 'js-cookie';
 import './LoginForm.css'
+import useAuthentication from "../hooks/useAuthentication";
 
 const LoginForm = ({ setAuthenticated }) => {
     const [username, setUsername] = useState('');
@@ -12,13 +13,7 @@ const LoginForm = ({ setAuthenticated }) => {
     const navigate = useNavigate();
 
     // Check for existing authentication token on component mount
-    useEffect(() => {
-        const token = Cookies.get('jwtToken');
-        if (token) {
-            // Token exists, set the authentication state to true
-            setAuthenticated(true);
-        }
-    }, [setAuthenticated]);
+    useAuthentication(setAuthenticated);
 
     const handleLogin = async () => {
         try {

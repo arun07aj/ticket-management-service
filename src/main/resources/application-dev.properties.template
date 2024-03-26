@@ -1,5 +1,13 @@
 # Development Environment Configuration Template
 
+# Server Configuration
+server.port=8080
+server.ssl.key-store=/path/to/keystore.jks
+server.ssl.key-store-password=<your-jks-keystore-password>
+server.ssl.keyStoreType=JKS
+server.servlet.context-path=/tms
+server.servlet.encoding.force=true
+
 # Database Configuration
 spring.datasource.url=jdbc:h2:mem:devdb
 spring.datasource.driverClassName=org.h2.Driver
@@ -9,10 +17,4 @@ spring.datasource.password=devpassword
 # Hibernate Configuration
 spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 
-# Server Configuration
-server.port=8080
-
-server.ssl.key-store=/path/to/keystore.jks
-server.ssl.key-store-password=<your-jks-keystore-password>
-server.ssl.keyStoreType=JKS
-
+spring.web.resources.static-locations=classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/

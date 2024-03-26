@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // skip auth for public api
                 .authorizeRequests().antMatchers("/api/public/*", "/h2-console/**").permitAll()
                 // api requiring auth and roles
+                .antMatchers("/users/**").hasAnyAuthority("USER", "ADMIN")
                 .antMatchers("/tickets/list/").hasAuthority("ADMIN")
                 .antMatchers("/tickets/list/{id}").hasAnyAuthority("USER", "ADMIN")
                 .antMatchers("/tickets/create", "/tickets/edit/*", "/tickets/list/my").hasAnyAuthority("USER", "ADMIN")

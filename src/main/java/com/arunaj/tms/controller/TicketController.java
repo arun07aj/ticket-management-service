@@ -1,6 +1,8 @@
 package com.arunaj.tms.controller;
 
+import com.arunaj.tms.dto.TicketDetailsDTO;
 import com.arunaj.tms.dto.TicketPatchDTO;
+import com.arunaj.tms.exception.InvalidDataException;
 import com.arunaj.tms.exception.TicketNotFoundException;
 import com.arunaj.tms.model.Ticket;
 import com.arunaj.tms.service.TicketService;
@@ -48,7 +50,7 @@ public class TicketController {
     @GetMapping("/list")
     public ResponseEntity<?> getAllTickets() {
         try {
-            List<Ticket> ticketsList = ticketService.getAllTickets();
+            List<TicketDetailsDTO> ticketsList = ticketService.getAllTickets();
             return new ResponseEntity<>(ticketsList, HttpStatus.OK);
         }
         catch(Exception e) {
@@ -61,7 +63,7 @@ public class TicketController {
     @GetMapping("/list/my")
     public ResponseEntity<?> getAllTicketsOfCurrentLoggedInUser() {
         try {
-            List<Ticket> ticketsList = ticketService.getAllTicketsOfCurrentLoggedInUser();
+            List<TicketDetailsDTO> ticketsList = ticketService.getAllTicketsOfCurrentLoggedInUser();
             return new ResponseEntity<>(ticketsList, HttpStatus.OK);
         } catch (Exception e) {
             logger.error("Error fetching ticket list of current logged-in user:", e);
@@ -73,7 +75,7 @@ public class TicketController {
     @GetMapping("/list/{id}")
     public ResponseEntity<?> getTicketById(@PathVariable long id) {
         try {
-            Optional<Ticket> ticket = ticketService.getTicketById(id);
+            Optional<TicketDetailsDTO> ticket = ticketService.getTicketById(id);
 
             if(ticket.isPresent()) {
                 // check if user is authorized to access the ticket
@@ -96,13 +98,18 @@ public class TicketController {
     @PatchMapping("/edit/{id}")
     public ResponseEntity<?> updateTicket(@PathVariable Long id, @RequestBody TicketPatchDTO ticketPatchDTO) {
         try {
-            Ticket ticket = ticketService.updateTicket(id, ticketPatchDTO);
+            TicketDetailsDTO ticket = ticketService.updateTicket(id, ticketPatchDTO);
             return new ResponseEntity<>(ticket, HttpStatus.OK);
         }
         catch(TicketNotFoundException e) {
             logger.info("No ticket exists with the ID " + id, e);
             return new ResponseEntity<>("No ticket exists with the ID " + id, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
+        }
+        catch(InvalidDataException e) {
+            logger.info("mandatory values may be null, details:", e);
+            return new ResponseEntity<>("mandatory values cannot be null", HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
             logger.error("Error occurred while updating ticket details:", e);
             return new ResponseEntity<>("Error occurred while updating ticket details", HttpStatus.INTERNAL_SERVER_ERROR);
         }

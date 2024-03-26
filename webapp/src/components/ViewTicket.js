@@ -44,8 +44,12 @@ const ViewTicket = ({ setAuthenticated }) => {
         axios.get(`${baseURL}tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}})
             .then(response => setTicketDetails(response.data))
             .catch(error => {
-                console.error('Error fetching ticket details:', error);
-                setError(error);
+                if (error.response && error.response.status === 403) {
+                    setError("Sorry, you are not authorized to access the ticket.");
+                } else {
+                    console.error('Error fetching ticket details:', error);
+                    setError("Error loading ticket details. Please try again later.");
+                }
             });
     }, [id]);
 
@@ -53,17 +57,17 @@ const ViewTicket = ({ setAuthenticated }) => {
         e.preventDefault();
 
         // Sanitize user input using DOMPurify
-        const sanitizedDesc = DOMPurify.sanitize(comments);
+        const sanitizedComment = DOMPurify.sanitize(comments);
 
         // Check if sanitized description is  not null or empty
-        if (!sanitizedDesc) {
+        if (!sanitizedComment) {
             setMessage('Comment cannot be empty.');
             return;
         }
 
         try {
             // Call the backend API to update the ticket with new comments
-            await axios.patch(`${baseURL}tickets/edit/${id}`,{ updatedDescription: sanitizedDesc }, {headers: {Authorization: `Bearer ${jwtToken}`}});
+            await axios.patch(`${baseURL}tickets/edit/${id}`,{ comment: sanitizedComment }, {headers: {Authorization: `Bearer ${jwtToken}`}});
 
             // Refresh ticket details after update
             const response = await axios.get(`${baseURL}tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}});
@@ -79,7 +83,7 @@ const ViewTicket = ({ setAuthenticated }) => {
     };
 
     if (error) {
-        return <div>Error loading ticket details. Please try again later.</div>;
+        return <div>{error}</div>;
     }
 
     if (!ticketDetails) {
@@ -91,8 +95,18 @@ const ViewTicket = ({ setAuthenticated }) => {
             <h1 style={{ textAlign: 'center' }}>{`View Ticket #${ticketDetails.id}`}</h1>
             <div className="ticket-details">
                 <p><strong>Subject:</strong> {ticketDetails.subject}</p>
+                <p><strong>Ticket Raised By:</strong> {ticketDetails.creatorEmail}</p>
                 <p><strong>Created Time:</strong> {ticketDetails.createdDate} | <strong>Status:</strong> {ticketDetails.status}</p>
                 <div><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></div>
+            </div>
+
+            <div className="comments-section">
+                <p><strong>Comments</strong></p>
+                {ticketDetails.comments.map((comment) => (
+                    <div key={comment.id} className="comment">
+                        <p>{comment.username}: {comment.content} [{comment.commentTime}]</p>
+                    </div>
+                ))}
             </div>
 
             <form className="comment-form" onSubmit={handleCommentSubmit}>

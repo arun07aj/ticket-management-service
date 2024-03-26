@@ -35,7 +35,7 @@ public class TicketServiceTest {
     @Test
     void testCheckAccessOfTicketIdByAccountId() {
         Account account = new Account(10L,"sa","sa@sa.com","sa", AccountRole.USER,true,null);
-        Ticket ticket = new Ticket(15L,"sa_sub", "sa_desc",new Date(), new Date(), "OPEN", account);
+        Ticket ticket = new Ticket(15L,"sa_sub", "sa_desc",new Date(), new Date(), "OPEN", account, null);
         List<Ticket> tickets = new ArrayList<>();
         tickets.add(ticket);
 
