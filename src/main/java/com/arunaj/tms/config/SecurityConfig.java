@@ -68,9 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // if stateful then no auth until its expiry
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .headers().frameOptions().disable();
+                .headers().frameOptions().sameOrigin();
 
-        http.headers().frameOptions().sameOrigin();
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
