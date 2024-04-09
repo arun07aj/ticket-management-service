@@ -2,19 +2,26 @@
 
 # Server Configuration
 server.port=8080
-server.ssl.key-store=/path/to/keystore.jks
-server.ssl.key-store-password=<your-jks-keystore-password>
-server.ssl.keyStoreType=JKS
+server.ssl.enabled=false
 server.servlet.context-path=/tms
 server.servlet.encoding.force=true
 
-# Database Configuration
+# Database Configuration for Hibernate
 spring.datasource.url=jdbc:h2:mem:devdb
 spring.datasource.driverClassName=org.h2.Driver
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.datasource.username=devuser
 spring.datasource.password=devpassword
 
-# Hibernate Configuration
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+# Database Configuration for AWS RDS via MySQL
+spring.datasource.url=jdbc:mysql://abc.us-east-1.rds.amazonaws.com:3306/db_name
+spring.datasource.username=username
+spring.datasource.password=password
+spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+spring.h2.console.enabled=false
+
+jwt.secret=changeit
+jwt.token.validity=900000
 
 spring.web.resources.static-locations=classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
