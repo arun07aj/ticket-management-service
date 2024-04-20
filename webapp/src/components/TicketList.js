@@ -16,6 +16,8 @@ const TicketList = ({setAuthenticated}) => {
     const baseURL = process.env.REACT_APP_API_BASE_URL;
 
     const [userRole, setUserRole] = useState(null);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     // Fetch user role when the component mounts
     useEffect(() => {
@@ -24,8 +26,9 @@ const TicketList = ({setAuthenticated}) => {
                 .then(response => {
                     setUserRole(response.data);
                 })
-                .catch(error => {
-                    console.error('Error fetching user role:', error);
+                .catch(() => {
+                    setError('Error fetching user role');
+                    setLoading(false);
                 });
         };
 
@@ -36,13 +39,25 @@ const TicketList = ({setAuthenticated}) => {
         // Fetch tickets from the /list API endpoint
         if(userRole === 'USER') {
             axios.get(`${baseURL}tickets/list/my`, {headers: {Authorization: `Bearer ${jwtToken}`}})
-                .then(response => setTickets(response.data))
-                .catch(error => console.error('Error fetching tickets:', error));
+                .then(response => {
+                    setTickets(response.data);
+                    setLoading(false);
+                })
+                .catch(() => {
+                    setError('Error fetching tickets');
+                    setLoading(false);
+                });
         }
         else if(userRole === 'ADMIN') {
             axios.get(`${baseURL}tickets/list`, {headers: {Authorization: `Bearer ${jwtToken}`}})
-                .then(response => setTickets(response.data))
-                .catch(error => console.error('Error fetching tickets:', error));
+                .then(response => {
+                    setTickets(response.data);
+                    setLoading(false);
+                })
+                .catch(() => {
+                    setError('Error fetching tickets');
+                    setLoading(false);
+                });
         }
     }, [baseURL, jwtToken, userRole]);
 
@@ -68,32 +83,44 @@ const TicketList = ({setAuthenticated}) => {
     return (
         <div className="ticket-list-container">
             <h2 className="table-title">Tickets</h2>
-            <table className="ticket-table">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Creator</th>
-                    <th>Subject</th>
-                    <th>Created Date</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {tickets.map((ticket) => (
-                    <tr key={ticket.id}>
-                        <td>{ticket.id}</td>
-                        <td>{ticket.creatorEmail}</td>
-                        <td>{ticket.subject}</td>
-                        <td>{ticket.createdDate}</td>
-                        <td>{ticket.status}</td>
-                        <td>
-                            <Link to={`/tickets/${ticket.id}`}>{`View Ticket #${ticket.id}`}</Link>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+            {error && <div className="error-message">{error}</div>}
+            {loading && <div className="loading-message">Loading...</div>}
+            {!error && !loading && (
+                <React.Fragment>
+                    {tickets.length === 0 ? (
+                        <div className="message">No tickets found.</div>
+                    ) : (
+                        <table className="ticket-table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Creator</th>
+                                <th>Subject</th>
+                                <th>Created Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {tickets.map((ticket) => (
+                                <tr key={ticket.id}>
+                                    <td>{ticket.id}</td>
+                                    <td>{ticket.creatorEmail}</td>
+                                    <td>{ticket.subject}</td>
+                                    <td>{ticket.createdDate}</td>
+                                    <td>{ticket.status}</td>
+                                    <td>
+                                        <Link to={`/tickets/${ticket.id}`}>{`View Ticket #${ticket.id}`}</Link>
+                                    </td>
+                                </tr>
+                            ))
+                            }
+                            </tbody>
+                        </table>
+                        )
+                    }
+                </React.Fragment>
+            )}
             {showLogoutPopup && <LogoutPopup onClose={closeLogoutPopup} />}
         </div>
     );
