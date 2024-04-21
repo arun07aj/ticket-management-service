@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import useLogout from '../hooks/useLogout';
 import LogoutPopup from './LogoutPopup';
 import './TicketList.css';
+import useFetchUserRole from "../hooks/useFetchUserRole";
 
 const TicketList = ({setAuthenticated}) => {
     const [tickets, setTickets] = useState([]);
@@ -15,25 +16,9 @@ const TicketList = ({setAuthenticated}) => {
     // Get the base URL from the environment variable
     const baseURL = process.env.REACT_APP_API_BASE_URL;
 
-    const [userRole, setUserRole] = useState(null);
+    const [userRole, fetchError] = useFetchUserRole(baseURL, jwtToken);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    // Fetch user role when the component mounts
-    useEffect(() => {
-        const fetchUserRole = async () => {
-            await axios.get(`${baseURL}users/role`, {headers: {Authorization: `Bearer ${jwtToken}`}})
-                .then(response => {
-                    setUserRole(response.data);
-                })
-                .catch(() => {
-                    setError('Error fetching user role');
-                    setLoading(false);
-                });
-        };
-
-        fetchUserRole();
-    }, [baseURL, jwtToken]);
 
     useEffect(() => {
         // Fetch tickets from the /list API endpoint
@@ -83,9 +68,10 @@ const TicketList = ({setAuthenticated}) => {
     return (
         <div className="ticket-list-container">
             <h2 className="table-title">Tickets</h2>
-            {error && <div className="error-message">{error}</div>}
-            {loading && <div className="loading-message">Loading...</div>}
-            {!error && !loading && (
+            {fetchError && !error && <div className="error-message">{fetchError}</div>}
+            {error && !fetchError && <div className="error-message">{error}</div>}
+            {loading && !(fetchError || error) && <div className="loading-message">Loading...</div>}
+            {!(fetchError || error) && !loading && (
                 <React.Fragment>
                     {tickets.length === 0 ? (
                         <div className="message">No tickets found.</div>

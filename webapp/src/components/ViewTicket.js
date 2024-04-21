@@ -7,23 +7,25 @@ import Cookies from 'js-cookie';
 import useLogout from '../hooks/useLogout';
 import LogoutPopup from './LogoutPopup';
 import './ViewTicket.css';
+import useFetchUserRole from "../hooks/useFetchUserRole";
 
 const ViewTicket = ({ setAuthenticated }) => {
     const { id } = useParams();
     // Retrieve the JWT token from the cookie
     const jwtToken = Cookies.get('jwtToken');
 
+    // Get the base URL from the environment variable
+    const baseURL = process.env.REACT_APP_API_BASE_URL;
+
     const [loading, setLoading] = useState(true);
     const [ticketDetails, setTicketDetails] = useState(null);
     const [comments, setComments] = useState('');
     const [error, setError] = useState(null);
     const [message, setMessage] = useState('');
+    const [userRole, fetchError] = useFetchUserRole(baseURL, jwtToken);
 
     const { handleLogout, setLogoutCallback } = useLogout({ setAuthenticated });
     const [showLogoutPopup, setShowLogoutPopup] = useState(false);
-
-    // Get the base URL from the environment variable
-    const baseURL = process.env.REACT_APP_API_BASE_URL;
 
     useEffect(() => {
         // Set the callback function in the useLogout hook
@@ -89,14 +91,14 @@ const ViewTicket = ({ setAuthenticated }) => {
 
     return (
         <div className="ticket-container">
-            {(error || loading) && (
+            {(fetchError || error || loading) && (
                 <h1 style={{ textAlign: 'center' }}>View Ticket</h1>
             )}
             <div className="error-loading-message">
-                {error && <div className="error-message">{error}</div>}
-                {loading && <div className="loading-message">Loading...</div>}
+                {(fetchError || error) && <div className="error-message">{error}</div>}
+                {loading && !(fetchError || error) && <div className="loading-message">Loading...</div>}
             </div>
-            {!error && !loading && ticketDetails && (
+            {!(fetchError || error) && !loading && ticketDetails && (
                 <React.Fragment>
                     <h1 style={{ textAlign: 'center' }}>{`View Ticket #${ticketDetails.id}`}</h1>
                     <div className="ticket-details">
