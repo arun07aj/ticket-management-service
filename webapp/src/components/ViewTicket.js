@@ -13,6 +13,7 @@ const ViewTicket = ({ setAuthenticated }) => {
     // Retrieve the JWT token from the cookie
     const jwtToken = Cookies.get('jwtToken');
 
+    const [loading, setLoading] = useState(true);
     const [ticketDetails, setTicketDetails] = useState(null);
     const [comments, setComments] = useState('');
     const [error, setError] = useState(null);
@@ -42,12 +43,17 @@ const ViewTicket = ({ setAuthenticated }) => {
 
     useEffect(() => {
         axios.get(`${baseURL}tickets/list/${id}`, {headers: {Authorization: `Bearer ${jwtToken}`}})
-            .then(response => setTicketDetails(response.data))
+            .then(response => {
+                setTicketDetails(response.data);
+                setLoading(false);
+            })
             .catch(error => {
+                setLoading(false);
                 if (error.response && error.response.status === 403) {
                     setError("Sorry, you are not authorized to access the ticket.");
+                } else if (error.response && error.response.status === 404) {
+                    setError("Sorry, the ticket does not exist.");
                 } else {
-                    console.error('Error fetching ticket details:', error);
                     setError("Error loading ticket details. Please try again later.");
                 }
             });
@@ -77,50 +83,52 @@ const ViewTicket = ({ setAuthenticated }) => {
             setComments('');
             setMessage('Comment added successfully.')
         } catch (error) {
-            console.error('Error updating ticket comments:', error);
-            setError(error);
+            setError('Error updating ticket comments, please try again later.');
         }
     };
 
-    if (error) {
-        return <div>{error}</div>;
-    }
-
-    if (!ticketDetails) {
-        return <p>Loading...</p>;
-    }
-
     return (
         <div className="ticket-container">
-            <h1 style={{ textAlign: 'center' }}>{`View Ticket #${ticketDetails.id}`}</h1>
-            <div className="ticket-details">
-                <p><strong>Subject:</strong> {ticketDetails.subject}</p>
-                <p><strong>Ticket Raised By:</strong> {ticketDetails.creatorEmail}</p>
-                <p><strong>Created Time:</strong> {ticketDetails.createdDate} | <strong>Status:</strong> {ticketDetails.status}</p>
-                <div><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></div>
+            {(error || loading) && (
+                <h1 style={{ textAlign: 'center' }}>View Ticket</h1>
+            )}
+            <div className="error-loading-message">
+                {error && <div className="error-message">{error}</div>}
+                {loading && <div className="loading-message">Loading...</div>}
             </div>
-
-            <div className="comments-section">
-                <p><strong>Comments</strong></p>
-                {ticketDetails.comments.map((comment) => (
-                    <div key={comment.id} className="comment">
-                        <p>{comment.username}: {comment.content} [{comment.commentTime}]</p>
+            {!error && !loading && ticketDetails && (
+                <React.Fragment>
+                    <h1 style={{ textAlign: 'center' }}>{`View Ticket #${ticketDetails.id}`}</h1>
+                    <div className="ticket-details">
+                        <p><strong>Subject:</strong> {ticketDetails.subject}</p>
+                        <p><strong>Ticket Raised By:</strong> {ticketDetails.creatorEmail}</p>
+                        <p><strong>Created Time:</strong> {ticketDetails.createdDate} | <strong>Status:</strong> {ticketDetails.status}</p>
+                        <div><strong>Description:</strong> <div dangerouslySetInnerHTML={{ __html: ticketDetails.description }} /></div>
                     </div>
-                ))}
-            </div>
 
-            <form className="comment-form" onSubmit={handleCommentSubmit}>
-                <div>
-                    <label htmlFor="comments">Add Comment</label>
-                    <textarea
-                        id="comments"
-                        value={comments}
-                        onChange={(e) => setComments(e.target.value)}
-                    />
-                </div>
-                <button type="submit">Submit</button>
-            </form>
-            <p className="message">{message}</p>
+                    <div className="comments-section">
+                        <p><strong>Comments</strong></p>
+                        {ticketDetails.comments.map((comment) => (
+                            <div key={comment.id} className="comment">
+                                <p>{comment.username}: {comment.content} [{comment.commentTime}]</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <form className="comment-form" onSubmit={handleCommentSubmit}>
+                        <div>
+                            <label htmlFor="comments">Add Comment</label>
+                            <textarea
+                                id="comments"
+                                value={comments}
+                                onChange={(e) => setComments(e.target.value)}
+                            />
+                        </div>
+                        <button type="submit">Submit</button>
+                    </form>
+                    <p className="comment-message">{message}</p>
+                </React.Fragment>
+            )}
             {showLogoutPopup && <LogoutPopup onClose={closeLogoutPopup} />}
         </div>
     );

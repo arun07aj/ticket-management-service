@@ -8,6 +8,11 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.error-loading-message {
+    margin: 0 auto;
+    text-align: center;
+}
+
 .ticket-details {
     margin-bottom: 20px;
 }
@@ -43,7 +48,7 @@ button:hover {
     background-color: #45a049;
 }
 
-.message {
+.comment-message {
     margin-top: 10px;
 }
 
