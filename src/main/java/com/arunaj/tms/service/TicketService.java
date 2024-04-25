@@ -2,6 +2,7 @@ package com.arunaj.tms.service;
 
 import com.arunaj.tms.dto.TicketDetailsDTO;
 import com.arunaj.tms.dto.TicketPatchDTO;
+import com.arunaj.tms.exception.InsufficientPrivilegeException;
 import com.arunaj.tms.exception.InvalidDataException;
 import com.arunaj.tms.exception.TicketNotFoundException;
 import com.arunaj.tms.model.Account;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Service
 public class TicketService {
@@ -119,6 +121,13 @@ public class TicketService {
     public TicketDetailsDTO updateTicket(long id, TicketPatchDTO ticketPatchDTO) throws Exception {
         Ticket existingTicket = ticketRepository.findById(id)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found for ID: " + id));
+
+        Supplier<Account> currentUserSupplier = () -> accountService.getCurrentLoggedInUser().orElseThrow(() -> new IllegalStateException("current logged-in user returned null"));
+        boolean isAdmin = currentUserSupplier.get().getRole().equals(AccountRole.ADMIN);
+
+        if(!isAdmin && !checkAccessOfTicketIdByAccountId(existingTicket.getId(), currentUserSupplier.get().getId())) {
+            throw new InsufficientPrivilegeException("only admin or ticket owner can add comments to ticket");
+        }
 
         // Update lastUpdatedDate
         existingTicket.setLastUpdatedDate(new Date(System.currentTimeMillis()));
