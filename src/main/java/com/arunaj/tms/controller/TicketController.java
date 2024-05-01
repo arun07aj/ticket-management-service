@@ -2,6 +2,7 @@ package com.arunaj.tms.controller;
 
 import com.arunaj.tms.dto.TicketDetailsDTO;
 import com.arunaj.tms.dto.TicketPatchDTO;
+import com.arunaj.tms.exception.InsufficientPrivilegeException;
 import com.arunaj.tms.exception.InvalidDataException;
 import com.arunaj.tms.exception.TicketNotFoundException;
 import com.arunaj.tms.model.Ticket;
@@ -108,6 +109,10 @@ public class TicketController {
         catch(InvalidDataException e) {
             logger.info("mandatory values may be null, details:", e);
             return new ResponseEntity<>("mandatory values cannot be null", HttpStatus.BAD_REQUEST);
+        }
+        catch(InsufficientPrivilegeException e) {
+            logger.info("you do not have privilege to access this operation, details:", e);
+            return new ResponseEntity<>("you do not have privilege to access this operation", HttpStatus.FORBIDDEN);
         }
         catch (Exception e) {
             logger.error("Error occurred while updating ticket details:", e);

@@ -2,6 +2,7 @@ package com.arunaj.tms.service;
 
 import com.arunaj.tms.dto.TicketDetailsDTO;
 import com.arunaj.tms.dto.TicketPatchDTO;
+import com.arunaj.tms.exception.InsufficientPrivilegeException;
 import com.arunaj.tms.exception.InvalidDataException;
 import com.arunaj.tms.exception.TicketNotFoundException;
 import com.arunaj.tms.model.Account;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Service
 public class TicketService {
@@ -120,6 +122,13 @@ public class TicketService {
         Ticket existingTicket = ticketRepository.findById(id)
                 .orElseThrow(() -> new TicketNotFoundException("Ticket not found for ID: " + id));
 
+        Supplier<Account> currentUserSupplier = () -> accountService.getCurrentLoggedInUser().orElseThrow(() -> new IllegalStateException("current logged-in user returned null"));
+        boolean isAdmin = currentUserSupplier.get().getRole().equals(AccountRole.ADMIN);
+
+        if(!isAdmin && !checkAccessOfTicketIdByAccountId(existingTicket.getId(), currentUserSupplier.get().getId())) {
+            throw new InsufficientPrivilegeException("only admin or ticket owner can add comments to ticket");
+        }
+
         // Update lastUpdatedDate
         existingTicket.setLastUpdatedDate(new Date(System.currentTimeMillis()));
 
@@ -129,7 +138,19 @@ public class TicketService {
         }
 
         // Update ticket status
-        if(ticketPatchDTO.getUpdatedStatus() != null) {
+        if(ticketPatchDTO.getUpdatedStatus() != null && !ticketPatchDTO.getUpdatedStatus().isEmpty()) {
+            // only admin can set status from MAR / WIP from OPEN
+            if((ticketPatchDTO.getUpdatedStatus().equals("MARK AS RESOLVED") || (ticketPatchDTO.getUpdatedStatus().equals("WIP"))) && !isAdmin) {
+                throw new InsufficientPrivilegeException("only admin roles can set tickets as WIP or resolved");
+            }
+            // user cannot resolve unless its MAR already by admin
+            if(!existingTicket.getStatus().equals("MARK AS RESOLVED") && ticketPatchDTO.getUpdatedStatus().equals("RESOLVED") && !isAdmin) {
+                throw new InsufficientPrivilegeException("user cannot resolve tickets that are not marked as resolved");
+            }
+            // restricting user to add new comments if ticket is resolved
+            if(!isAdmin && existingTicket.getStatus().equals("RESOLVED")) {
+                throw new InsufficientPrivilegeException("user cannot add new comments to tickets that are resolved");
+            }
             existingTicket.setStatus(ticketPatchDTO.getUpdatedStatus());
         }
         // if none mentioned then set it as OPEN
