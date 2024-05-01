@@ -1,7 +1,7 @@
 /* ViewTicket.css */
 .ticket-container {
-    max-width: 600px;
-    margin: 0 auto;
+    max-width: 800px;
+    margin: 20px auto;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -9,7 +9,7 @@
 }
 
 .error-loading-message {
-    margin: 0 auto;
+    margin-bottom: 20px;
     text-align: center;
 }
 
@@ -18,21 +18,37 @@
 }
 
 .comment-form {
+    display: flex;
+    flex-wrap: wrap;
     margin-top: 20px;
 }
 
+.form-group {
+    margin-bottom: 10px;
+}
+
+.dropdown-container {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
 label {
-    display: block;
-    margin-bottom: 5px;
+    margin-right: 10px;
 }
 
 textarea {
     height: 100px;
-    padding: 8px;
+    padding: 10px;
     margin-bottom: 10px;
     resize: vertical;
     width: calc(100% - 18px);
     max-height: 350px;
+}
+
+.reject-button {
+    background-color:red;
 }
 
 button {
@@ -42,10 +58,16 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-left: 0px;
 }
 
 button:hover {
     background-color: #45a049;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
 .comment-message {

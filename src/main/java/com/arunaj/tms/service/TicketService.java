@@ -138,7 +138,19 @@ public class TicketService {
         }
 
         // Update ticket status
-        if(ticketPatchDTO.getUpdatedStatus() != null) {
+        if(ticketPatchDTO.getUpdatedStatus() != null && !ticketPatchDTO.getUpdatedStatus().isEmpty()) {
+            // only admin can set status from MAR / WIP from OPEN
+            if((ticketPatchDTO.getUpdatedStatus().equals("MARK AS RESOLVED") || (ticketPatchDTO.getUpdatedStatus().equals("WIP"))) && !isAdmin) {
+                throw new InsufficientPrivilegeException("only admin roles can set tickets as WIP or resolved");
+            }
+            // user cannot resolve unless its MAR already by admin
+            if(!existingTicket.getStatus().equals("MARK AS RESOLVED") && ticketPatchDTO.getUpdatedStatus().equals("RESOLVED") && !isAdmin) {
+                throw new InsufficientPrivilegeException("user cannot resolve tickets that are not marked as resolved");
+            }
+            // restricting user to add new comments if ticket is resolved
+            if(!isAdmin && existingTicket.getStatus().equals("RESOLVED")) {
+                throw new InsufficientPrivilegeException("user cannot add new comments to tickets that are resolved");
+            }
             existingTicket.setStatus(ticketPatchDTO.getUpdatedStatus());
         }
         // if none mentioned then set it as OPEN
