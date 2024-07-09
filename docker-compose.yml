@@ -1,0 +1,6 @@
+version: '3'
+services:
+  springboot:
+    image: arun07aj/tmsapp:latest
+    ports:
+      - "8080:8080"
