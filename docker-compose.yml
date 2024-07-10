@@ -1,6 +1,14 @@
-version: '3'
+version: '3.7'
 services:
   springboot:
     image: arun07aj/tmsapp:latest
     ports:
       - "8080:8080"
+    secrets:
+      - application-prod.properties
+    volumes:
+      - /home/ubuntu/ssl-bundle-arunaj-co/keystore.jks:/app/keystore.jks:ro
+
+secrets:
+  application-prod.properties:
+    external: true

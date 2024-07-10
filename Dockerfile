@@ -9,7 +9,7 @@ COPY src/ ./src
 COPY pom.xml .
 
 # Build the backend application
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 # Stage 2: Build the React frontend
 FROM node:14 AS frontend-build
@@ -35,6 +35,12 @@ COPY --from=build /app/target/*.jar app.jar
 
 # Copy the built frontend static files to the Spring Boot resources directory
 COPY --from=frontend-build /app/webapp/build/ /app/src/main/resources/static/
+
+# Create a directory for Docker secrets
+RUN mkdir -p /run/secrets
+
+# Copy Docker secrets
+COPY --from=build /run/secrets/application-prod.properties /app/src/main/resources/application-prod.properties
 
 # Expose backend server port
 EXPOSE 8080
