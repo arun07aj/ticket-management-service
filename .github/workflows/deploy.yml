@@ -35,7 +35,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} 'echo "SSH connection successful"'
 
-      - name: SSH into EC2 and deploy
+      - name: SSH into EC2 and deploy app to VM
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} '
             cd /home/ubuntu/services/tmsapp/ &&
