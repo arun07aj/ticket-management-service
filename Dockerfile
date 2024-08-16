@@ -4,15 +4,13 @@ FROM maven:3.8.4-amazoncorretto-17 AS build
 # Set the working directory for the backend
 WORKDIR /app
 
-# Create a directory for Docker secrets
-RUN mkdir -p /run/secrets
-
-# Copy the application-prod.properties secret
-COPY /run/secrets/application-prod.properties /app/src/main/resources/application-prod.properties
-
 # Copy the backend source code
 COPY src/ ./src
 COPY pom.xml .
+
+# Use secrets for sensitive files during build
+RUN --mount=type=secret,id=application-prod.properties \
+    cp /run/secrets/application-prod.properties /app/src/main/resources/application-prod.properties
 
 # Build the backend application
 RUN mvn clean package -DskipTests
@@ -26,8 +24,9 @@ WORKDIR /app/webapp
 # Copy the frontend source code
 COPY webapp/ .
 
-# Copy the .env.prod secret file
-COPY /run/secrets/prod_env_react /app/webapp/src/.env.prod
+# Use secrets for sensitive files during build
+RUN --mount=type=secret,id=prod_env_react \
+    cp /run/secrets/prod_env_react /app/webapp/src/.env.prod
 
 # Install frontend dependencies and build for production
 RUN npm install
