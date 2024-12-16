@@ -47,9 +47,13 @@ jobs:
             # Stop and remove the existing tmsapp container 
             docker ps -a -q --filter "name=tmsapp" | grep -q . && docker rm -f tmsapp || echo "No container to stop/remove"
           
+            # In docker -v loc1:loc2 syntax, loc2 cannot be given as a git action var
+            # Workaround is to copy the git action var to a local shell var
+            export TMS_KEYSTORE_PATH=${{ secrets.SSL_KEYSTORE_PATH }}
+          
             # Run the new container (8082 of ec2 to 8080 of img) 
             docker run -d --name tmsapp -p 8082:8080 \
-              -v ${{ secrets.SSL_KEYSTORE_PATH }}:/etc/tmsapp/keystore/keystore.jks \
+              -v ${{ secrets.SSL_KEYSTORE_PATH }}:${TMS_KEYSTORE_PATH} \
               -e SSL_KEYSTORE_PATH=${{ secrets.SSL_KEYSTORE_PATH }} \
               -e SSL_KEYSTORE_PSWD=${{ secrets.SSL_KEYSTORE_PSWD }} \
               -e SSL_KEYSTORE_TYPE=${{ secrets.SSL_KEYSTORE_TYPE }} \
