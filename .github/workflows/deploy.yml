@@ -1,4 +1,4 @@
-name: Deploy to AWS EC2
+name: Deploy to VM Server
 
 on:
   push:
@@ -22,11 +22,22 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
+      - name: Populate React app's env
+        run: |
+          sed -i "s|REACT_APP_API_BASE_URL=.*|REACT_APP_API_BASE_URL=${{ secrets.TMS_APP_API_BASE_URL }}|g" webapp/.env.prod
+
+      - name: Build and push backend Docker image
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
             -t ${{ secrets.DOCKER_USERNAME }}/tmsapp:latest \
-            -f Dockerfile . \
+            -f backend.dockerfile . \
+            --push
+
+      - name: Build and push frontend React image
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -t ${{ secrets.DOCKER_USERNAME }}/tms-fe:latest \
+            -f webapp/frontend.dockerfile . \
             --push
 
       - name: Prepare SSH key
@@ -40,29 +51,38 @@ jobs:
       - name: SSH into EC2, pull latest Docker image, and restart container
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} << 'EOF'
-            
-            cd /home/ubuntu/ || exit
           
-            # Pull the latest Docker image from Docker Hub
-            docker pull ${{ secrets.DOCKER_USERNAME }}/tmsapp:latest
+          # Pull the latest Docker images from Docker Hub
+          docker pull ${{ secrets.DOCKER_USERNAME }}/tmsapp:latest
+          docker pull ${{ secrets.DOCKER_USERNAME }}/tms-fe:latest
+        
+          # Stop and remove the existing tmsapp containers
+          docker ps -a -q --filter "name=tmsapp" | grep -q . && docker rm -f tmsapp || echo "No tms backend container to stop/remove"
+          docker ps -a -q --filter "name=tms-fe" | grep -q . && docker rm -f tms-fe || echo "No tms frontend container to stop/remove"
+        
+          # In docker -v loc1:loc2 syntax, loc2 cannot be given as a git action var
+          # Workaround is to copy the git action var to a local shell var
+          export TMS_KEYSTORE_PATH=${{ secrets.SSL_KEYSTORE_PATH }}
+        
+          # Run the backend container (8080 of VM to 8080 of image) 
+          docker run -d --name tmsapp -p 8080:8080 \
+            -v "${{ secrets.SSL_KEYSTORE_PATH }}:${TMS_KEYSTORE_PATH}" \
+            -e SSL_KEYSTORE_PATH="${{ secrets.SSL_KEYSTORE_PATH }}" \
+            -e SSL_KEYSTORE_PSWD="${{ secrets.SSL_KEYSTORE_PSWD }}" \
+            -e SSL_KEYSTORE_TYPE="${{ secrets.SSL_KEYSTORE_TYPE }}" \
+            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            -e JWT_VALIDITY="${{ secrets.JWT_VALIDITY }}" \
+            -e DB_URL="${{ secrets.DB_URL }}" \
+            -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
+            -e DB_PSWD="${{ secrets.DB_PSWD }}" \
+            "${{ secrets.DOCKER_USERNAME }}/tmsapp:latest"
           
-            # Stop and remove the existing tmsapp container 
-            docker ps -a -q --filter "name=tmsapp" | grep -q . && docker rm -f tmsapp || echo "No container to stop/remove"
+            # Run the frontend container (3000 of VM to 80 of image) 
+            docker run -d --name tms-fe -p 3000:80 \
+              ${{ secrets.DOCKER_USERNAME }}/tms-fe:latest
           
-            # In docker -v loc1:loc2 syntax, loc2 cannot be given as a git action var
-            # Workaround is to copy the git action var to a local shell var
-            export TMS_KEYSTORE_PATH=${{ secrets.SSL_KEYSTORE_PATH }}
-          
-            # Run the new container (8082 of ec2 to 8080 of img) 
-            docker run -d --name tmsapp -p 8082:8080 \
-              -v ${{ secrets.SSL_KEYSTORE_PATH }}:${TMS_KEYSTORE_PATH} \
-              -e SSL_KEYSTORE_PATH=${{ secrets.SSL_KEYSTORE_PATH }} \
-              -e SSL_KEYSTORE_PSWD=${{ secrets.SSL_KEYSTORE_PSWD }} \
-              -e SSL_KEYSTORE_TYPE=${{ secrets.SSL_KEYSTORE_TYPE }} \
-              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              -e JWT_VALIDITY=${{ secrets.JWT_VALIDITY }} \
-              -e DB_URL=${{ secrets.DB_URL }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PSWD=${{ secrets.DB_PSWD }} \
-              ${{ secrets.DOCKER_USERNAME }}/tmsapp:latest
+            echo "Reloading Nginx..."
+            sudo systemctl reload nginx
+            echo "Nginx reloaded successfully!"
+            echo "Deployment completed."
           EOF
