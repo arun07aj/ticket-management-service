@@ -14,6 +14,14 @@ spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
 spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 spring.h2.console.enabled=false
 
+# Database Configuration for OCI VM via Oracle ADB
+spring.datasource.url=jdbc:oracle:thin:@(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.host.oraclecloud.com))(connect_data=(service_name=servicename.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+spring.datasource.username=username
+spring.datasource.password=password
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+spring.h2.console.enabled=false
+
 # JWT Configuration
 jwt.secret=changeit
 jwt.token.validity=900000
