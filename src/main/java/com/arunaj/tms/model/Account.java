@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,8 @@ import java.util.List;
 @Entity
 public class Account implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
+    @SequenceGenerator(name = "account_seq", sequenceName = "account_id_SEQ", allocationSize = 1)
     private Long id;
     @Column(unique = true, nullable = false)
     private String username;
@@ -31,6 +33,7 @@ public class Account implements UserDetails {
     private String password;
     @Enumerated(EnumType.STRING)
     private AccountRole role;
+    @Column(name = "IS_ACTIVE")
     private boolean isActive;
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     @JsonIgnore

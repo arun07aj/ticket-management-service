@@ -14,8 +14,8 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CommentServiceTest {
@@ -35,11 +35,11 @@ public class CommentServiceTest {
         Account userAccount = new Account(10L,"sa","sa@sa.com","sa", AccountRole.USER,true,null);
         Account adminAccount = new Account(1L,"admin1","admin1@sa.com","a1", AccountRole.ADMIN,true,null);
 
-        Ticket ticket = new Ticket(1L, "dummyticket", "dummydesc", new Date(), new Date(), "OPEN", userAccount, null );
+        Ticket ticket = new Ticket(1L, "dummyticket", "dummydesc", LocalDateTime.now(), LocalDateTime.now(), "OPEN", userAccount, null );
 
         List<Comment> comments = new ArrayList<>();
-        Comment userComment = new Comment(1L, "please fix asap", new Date(), userAccount.getUsername(), ticket);
-        Comment adminComment = new Comment(2L, "looking on it", new Date(), adminAccount.getUsername(), ticket);
+        Comment userComment = new Comment(1L, "please fix asap", LocalDateTime.now(), userAccount.getUsername(), ticket);
+        Comment adminComment = new Comment(2L, "looking on it", LocalDateTime.now(), adminAccount.getUsername(), ticket);
         comments.add(userComment);
         comments.add(adminComment);
 

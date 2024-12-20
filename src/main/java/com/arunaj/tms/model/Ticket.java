@@ -6,30 +6,38 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import java.util.Date;
+import javax.persistence.SequenceGenerator;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 public class Ticket {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_seq")
+    @SequenceGenerator(name = "ticket_seq", sequenceName = "ticket_id_SEQ", allocationSize = 1)
     private Long id;
-    @Column(length=256)
+    @Column(length = 256, nullable = false)
     private String subject;
-    @Column(length=1024)
+    @Lob
+    @Column(nullable = false)
     private String description;
-    private Date createdDate;
-    private Date lastUpdatedDate;
+    @Column(name = "CREATED_DATE", nullable = false)
+    private LocalDateTime createdDate;
+    @Column(name = "LAST_UPDATED_DATE", nullable = false)
+    private LocalDateTime lastUpdatedDate;
+    @Column(nullable = false)
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "account_id", nullable = false)
     @JsonBackReference
     private Account account;
 
@@ -43,7 +51,7 @@ public class Ticket {
         // Default constructor
     }
 
-    public Ticket(Long id, String subject, String description, Date createdDate, Date lastUpdatedDate, String status, Account account, List<Comment> comments) {
+    public Ticket(Long id, String subject, String description, LocalDateTime createdDate, LocalDateTime lastUpdatedDate, String status, Account account, List<Comment> comments) {
         this.id = id;
         this.subject = subject;
         this.description = description;
@@ -79,19 +87,19 @@ public class Ticket {
         this.description = description;
     }
 
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Date getLastUpdatedDate() {
+    public LocalDateTime getLastUpdatedDate() {
         return lastUpdatedDate;
     }
 
-    public void setLastUpdatedDate(Date lastUpdatedDate) {
+    public void setLastUpdatedDate(LocalDateTime lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
     }
 

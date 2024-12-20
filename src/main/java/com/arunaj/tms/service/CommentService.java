@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,7 +25,7 @@ public class CommentService {
         Comment commentObj = new Comment();
         if(comment != null && !comment.isBlank()) {
             commentObj.setContent(comment);
-            commentObj.setCommentTime(new Date(System.currentTimeMillis()));
+            commentObj.setCommentTime(LocalDateTime.now());
             commentObj.setTicket(ticket);
             if(accountService.getCurrentLoggedInUser().isPresent()) {
                 commentObj.setUsername(accountService.getCurrentLoggedInUser().get().getUsername());

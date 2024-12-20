@@ -11,8 +11,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +35,7 @@ public class TicketServiceTest {
     @Test
     void testCheckAccessOfTicketIdByAccountId() {
         Account account = new Account(10L,"sa","sa@sa.com","sa", AccountRole.USER,true,null);
-        Ticket ticket = new Ticket(15L,"sa_sub", "sa_desc",new Date(), new Date(), "OPEN", account, null);
+        Ticket ticket = new Ticket(15L,"sa_sub", "sa_desc", LocalDateTime.now(), LocalDateTime.now(), "OPEN", account, null);
         List<Ticket> tickets = new ArrayList<>();
         tickets.add(ticket);
 

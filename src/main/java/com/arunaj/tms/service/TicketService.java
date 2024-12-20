@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class TicketService {
 
         if(ticket != null) {
             ticket.setStatus("OPEN");
-            ticket.setCreatedDate(new Date(System.currentTimeMillis()));
+            ticket.setCreatedDate(LocalDateTime.now());
             ticket.setLastUpdatedDate(ticket.getCreatedDate());
 
             if(accountService.getCurrentLoggedInUser().isPresent()) {
@@ -130,7 +130,7 @@ public class TicketService {
         }
 
         // Update lastUpdatedDate
-        existingTicket.setLastUpdatedDate(new Date(System.currentTimeMillis()));
+        existingTicket.setLastUpdatedDate(LocalDateTime.now());
 
         // Update description if provided
         if (ticketPatchDTO.getUpdatedDescription() != null) {
