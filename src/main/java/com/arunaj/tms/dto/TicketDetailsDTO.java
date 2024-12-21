@@ -2,20 +2,20 @@ package com.arunaj.tms.dto;
 
 import com.arunaj.tms.model.Comment;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TicketDetailsDTO {
     private Long id;
     private String subject;
     private String description;
-    private Date createdDate;
-    private Date lastUpdatedDate;
+    private LocalDateTime createdDate;
+    private LocalDateTime lastUpdatedDate;
     private String status;
     private String creatorEmail;
     private List<Comment> comments;
 
-    public TicketDetailsDTO(Long id, String subject, String description, Date createdDate, Date lastUpdatedDate, String status, String creatorEmail) {
+    public TicketDetailsDTO(Long id, String subject, String description, LocalDateTime createdDate, LocalDateTime lastUpdatedDate, String status, String creatorEmail) {
         this.id = id;
         this.subject = subject;
         this.description = description;
@@ -49,19 +49,19 @@ public class TicketDetailsDTO {
         this.description = description;
     }
 
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Date getLastUpdatedDate() {
+    public LocalDateTime getLastUpdatedDate() {
         return lastUpdatedDate;
     }
 
-    public void setLastUpdatedDate(Date lastUpdatedDate) {
+    public void setLastUpdatedDate(LocalDateTime lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
     }
 

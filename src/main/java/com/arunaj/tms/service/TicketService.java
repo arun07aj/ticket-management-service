@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class TicketService {
 
         if(ticket != null) {
             ticket.setStatus("OPEN");
-            ticket.setCreatedDate(new Date(System.currentTimeMillis()));
+            ticket.setCreatedDate(LocalDateTime.now());
             ticket.setLastUpdatedDate(ticket.getCreatedDate());
 
             if(accountService.getCurrentLoggedInUser().isPresent()) {
@@ -56,8 +56,8 @@ public class TicketService {
 
     private boolean isValidTicket(Ticket ticket) {
         // Check for non-null and non-empty values
-        return ticket.getDescription() != null && !ticket.getDescription().isEmpty() &&
-                ticket.getSubject() != null && !ticket.getSubject().isEmpty();
+        return ticket.getDescription() != null && !ticket.getDescription().isBlank() &&
+                ticket.getSubject() != null && !ticket.getSubject().isBlank();
     }
 
     public Optional<TicketDetailsDTO> getTicketById(long id) {
@@ -130,7 +130,7 @@ public class TicketService {
         }
 
         // Update lastUpdatedDate
-        existingTicket.setLastUpdatedDate(new Date(System.currentTimeMillis()));
+        existingTicket.setLastUpdatedDate(LocalDateTime.now());
 
         // Update description if provided
         if (ticketPatchDTO.getUpdatedDescription() != null) {
@@ -138,7 +138,7 @@ public class TicketService {
         }
 
         // Update ticket status
-        if(ticketPatchDTO.getUpdatedStatus() != null && !ticketPatchDTO.getUpdatedStatus().isEmpty()) {
+        if(ticketPatchDTO.getUpdatedStatus() != null && !ticketPatchDTO.getUpdatedStatus().isBlank()) {
             // only admin can set status from MAR / WIP from OPEN
             if((ticketPatchDTO.getUpdatedStatus().equals("MARK AS RESOLVED") || (ticketPatchDTO.getUpdatedStatus().equals("WIP"))) && !isAdmin) {
                 throw new InsufficientPrivilegeException("only admin roles can set tickets as WIP or resolved");
@@ -166,7 +166,7 @@ public class TicketService {
         }
 
         ticketRepository.save(existingTicket);
-        logger.info("edit ticket successful and fetching ticket id: " + id);
+        logger.info("edit ticket successful and fetching ticket id: {}", id);
         return getTicketById(id).get();
     }
 

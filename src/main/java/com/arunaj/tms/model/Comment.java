@@ -10,16 +10,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import java.util.Date;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "\"COMMENT\"")
 public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comment_seq")
+    @SequenceGenerator(name = "comment_seq", sequenceName = "comment__id_1SEQ", allocationSize = 1)
     private Long id;
-    @Column(length=1024)
+    @Column(length = 1024, nullable = false)
     private String content;
-    private Date commentTime;
+    @Column(name = "COMMENT_TIME", nullable = false)
+    private LocalDateTime commentTime;
+    @Column(nullable = false)
     private String username;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -27,7 +33,7 @@ public class Comment {
     @JsonBackReference
     private Ticket ticket;
 
-    public Comment(Long id, String content, Date commentTime, String username, Ticket ticket) {
+    public Comment(Long id, String content, LocalDateTime commentTime, String username, Ticket ticket) {
         this.id = id;
         this.content = content;
         this.commentTime = commentTime;
@@ -47,11 +53,11 @@ public class Comment {
         this.content = content;
     }
 
-    public Date getCommentTime() {
+    public LocalDateTime getCommentTime() {
         return commentTime;
     }
 
-    public void setCommentTime(Date commentTime) {
+    public void setCommentTime(LocalDateTime commentTime) {
         this.commentTime = commentTime;
     }
 
