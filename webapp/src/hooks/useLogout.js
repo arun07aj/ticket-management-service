@@ -23,7 +23,9 @@ const useLogout = ({ setAuthenticated }) => {
             try {
                 const decodedToken = jwt_decode(JSON.stringify(token));
                 if (decodedToken && decodedToken.exp * 1000 <= Date.now()) {
-                    // If the token is about to expire, trigger the logout callback
+                    // Clear the cookie immediately once the token is found as expired
+                    Cookies.remove('jwtToken', { sameSite: 'None', secure: true });
+                    // Trigger the logout callback
                     if (logoutCallback) {
                         logoutCallback();
                     }
@@ -35,8 +37,11 @@ const useLogout = ({ setAuthenticated }) => {
     };
 
     useEffect(() => {
-        // Check for token expiration every 5s
-        const intervalId = setInterval(checkTokenExpiration, 5000);
+        // Check token status first
+        checkTokenExpiration();
+
+        // Check for token expiration every 15s
+        const intervalId = setInterval(checkTokenExpiration, 15000);
 
         // Cleanup the interval on component unmount
         return () => clearInterval(intervalId);
