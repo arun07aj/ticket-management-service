@@ -1,11 +1,11 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { jwtDecode as jwt_decode } from 'jwt-decode';
 
 const useLogout = ({ setAuthenticated }) => {
     const navigate = useNavigate();
-    let logoutCallback = null;
+    const logoutCallbackRef = useRef(null);
     const handleLogout = () => {
         // Clear the authentication token
         Cookies.remove('jwtToken', { sameSite: 'None', secure: true });
@@ -21,13 +21,16 @@ const useLogout = ({ setAuthenticated }) => {
         const token = Cookies.get('jwtToken');
         if (token) {
             try {
-                const decodedToken = jwt_decode(JSON.stringify(token));
+                const decodedToken = jwt_decode(token);
                 if (decodedToken && decodedToken.exp * 1000 <= Date.now()) {
                     // Clear the cookie immediately once the token is found as expired
                     Cookies.remove('jwtToken', { sameSite: 'None', secure: true });
                     // Trigger the logout callback
-                    if (logoutCallback) {
-                        logoutCallback();
+                    if (logoutCallbackRef.current) {
+                        logoutCallbackRef.current();
+                    }
+                    else {
+                        handleLogout()
                     }
                 }
             } catch (error) {
@@ -48,7 +51,7 @@ const useLogout = ({ setAuthenticated }) => {
     }, [setAuthenticated, navigate]);
 
     const setLogoutCallback = (callback) => {
-        logoutCallback = callback;
+        logoutCallbackRef.current = callback;
     };
 
     return { handleLogout, setLogoutCallback };
