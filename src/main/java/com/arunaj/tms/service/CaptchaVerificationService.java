@@ -3,6 +3,7 @@ package com.arunaj.tms.service;
 import com.arunaj.tms.util.HttpClientUtil;
 import com.arunaj.tms.util.LoggerUtil;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -11,6 +12,9 @@ import java.util.Map;
 public class CaptchaVerificationService {
     private static final Logger logger = LoggerUtil.getLogger(CaptchaVerificationService.class);
 
+    @Value("${recaptcha-service.enabled}")
+    private boolean isCaptchaEnabled;
+
     private final HttpClientUtil httpClientUtil;
 
     public CaptchaVerificationService(HttpClientUtil httpClientUtil) {
@@ -18,6 +22,11 @@ public class CaptchaVerificationService {
     }
 
     public boolean verifyCaptcha(String captchaResponse) {
+        // Skip CAPTCHA handling if disabled
+        if (!isCaptchaEnabled) {
+            logger.info("Captcha verification is disabled");
+            return true;
+        }
 
         try {
             String url = "https://arunaj.co/verify-captcha";
