@@ -6,6 +6,7 @@ import com.arunaj.tms.exception.AccountAlreadyExistsException;
 import com.arunaj.tms.exception.BadRequestException;
 import com.arunaj.tms.model.Account;
 import com.arunaj.tms.service.AccountService;
+import com.arunaj.tms.service.CaptchaVerificationService;
 import com.arunaj.tms.util.JwtUtil;
 import com.arunaj.tms.util.LoggerUtil;
 import org.slf4j.Logger;
@@ -37,10 +38,18 @@ public class PublicController {
     private AccountService accountService;
 
     @Autowired
+    private CaptchaVerificationService captchaVerificationService;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO loginDTO) throws Exception {
+        boolean captchaValid = captchaVerificationService.verifyCaptcha(loginDTO.getCaptchaResponse());
+        if (!captchaValid) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid reCAPTCHA response");
+        }
+
         authenticate(loginDTO.getUsername(), loginDTO.getPassword());
         final Optional<Account> account = accountService.loadAccountByUsername(loginDTO.getUsername());
         if(account.isPresent()) {
@@ -73,7 +82,7 @@ public class PublicController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
         catch(Exception e){
-            logger.error("Failed to create account: " + e);
+            logger.error("Failed to create account: {}", String.valueOf(e));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating account at the moment");
         }
     }
