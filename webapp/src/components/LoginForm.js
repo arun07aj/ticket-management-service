@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import Cookies from 'js-cookie';
+import ReCAPTCHA from "react-google-recaptcha"
 import './LoginForm.css'
 import useAuthentication from "../hooks/useAuthentication";
 
@@ -10,6 +11,7 @@ const LoginForm = ({ setAuthenticated }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [captchaResponse, setCaptchaResponse] = useState('');
     const navigate = useNavigate();
 
     // Check for existing authentication token on component mount
@@ -27,7 +29,8 @@ const LoginForm = ({ setAuthenticated }) => {
             // Make API call to login endpoint
             const response = await axios.post(`${baseURL}api/public/login`, {
                 username: sanitizedUsername,
-                password: sanitizedPassword
+                password: sanitizedPassword,
+                captchaResponse: captchaResponse,
             });
 
             // API returns a token upon successful login
@@ -50,6 +53,9 @@ const LoginForm = ({ setAuthenticated }) => {
             else if (error.response && error.response.status === 401) {
                 setMessage('Invalid username or password. Please try again.');
                 throw new Error('Authentication Error');
+            } else if (error.response && error.response.status === 403) {
+                setMessage('Invalid CAPTCHA response. Please try again.');
+                throw new Error('CAPTCHA Error');
             } else {
                 setMessage('An error occurred during login. Please try again later.');
                 throw error;
@@ -62,6 +68,11 @@ const LoginForm = ({ setAuthenticated }) => {
 
         if (!username || !password) {
             setMessage('Please enter both username and password.');
+            return;
+        }
+
+        if (!captchaResponse) {
+            setMessage('Please complete the CAPTCHA verification.');
             return;
         }
 
@@ -102,6 +113,14 @@ const LoginForm = ({ setAuthenticated }) => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
+
+                    <div className="form-group recaptcha-container">
+                        <ReCAPTCHA
+                            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                            onChange={setCaptchaResponse}
+                        />
+                    </div>
+
                 <button className="button" type="submit">
                     Login
                 </button>
