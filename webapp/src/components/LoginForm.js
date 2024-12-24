@@ -17,6 +17,8 @@ const LoginForm = ({ setAuthenticated }) => {
     // Check for existing authentication token on component mount
     useAuthentication(setAuthenticated);
 
+    const isCaptchaEnabled = process.env.REACT_APP_ENABLE_CAPTCHA === 'true';
+
     const handleLogin = async () => {
         try {
             // Sanitize user input using DOMPurify
@@ -30,7 +32,7 @@ const LoginForm = ({ setAuthenticated }) => {
             const response = await axios.post(`${baseURL}api/public/login`, {
                 username: sanitizedUsername,
                 password: sanitizedPassword,
-                captchaResponse: captchaResponse,
+                captchaResponse: isCaptchaEnabled ? captchaResponse : null,
             });
 
             // API returns a token upon successful login
@@ -71,7 +73,7 @@ const LoginForm = ({ setAuthenticated }) => {
             return;
         }
 
-        if (!captchaResponse) {
+        if (isCaptchaEnabled && !captchaResponse) {
             setMessage('Please complete the CAPTCHA verification.');
             return;
         }
@@ -113,14 +115,14 @@ const LoginForm = ({ setAuthenticated }) => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-
+                {isCaptchaEnabled && (
                     <div className="form-group recaptcha-container">
                         <ReCAPTCHA
                             sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                             onChange={setCaptchaResponse}
                         />
                     </div>
-
+                )}
                 <button className="button" type="submit">
                     Login
                 </button>
