@@ -25,6 +25,7 @@ jobs:
       - name: Populate React app's env
         run: |
           sed -i "s|REACT_APP_API_BASE_URL=.*|REACT_APP_API_BASE_URL=${{ secrets.TMS_APP_API_BASE_URL }}|g" webapp/.env.prod
+          sed -i "s|REACT_APP_RECAPTCHA_SITE_KEY=.*|REACT_APP_RECAPTCHA_SITE_KEY=${{ secrets.CAPTCHA_SITE_SECRET }}|g" webapp/.env.prod
 
       - name: Build and push backend Docker image
         run: |
