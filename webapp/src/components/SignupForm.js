@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import ReCAPTCHA from "react-google-recaptcha"
 import DOMPurify from 'dompurify';
 import './SignupForm.css'
 
@@ -7,7 +8,9 @@ const SignupForm = () => {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [captchaResponse, setCaptchaResponse] = useState('');
     const [message, setMessage] = useState('');
+    const isCaptchaEnabled = process.env.REACT_APP_ENABLE_CAPTCHA === 'true';
 
     const sanitizeInput = (input) => {
         return DOMPurify.sanitize(input.trim());
@@ -25,7 +28,8 @@ const SignupForm = () => {
             const response = await axios.post(`${baseURL}api/public/signup`, {
                 email: sanitizedEmail,
                 username: sanitizedUsername,
-                password: sanitizedPassword
+                password: sanitizedPassword,
+                captchaResponse: isCaptchaEnabled ? captchaResponse : null,
             });
 
             setMessage(`${response.data}`);
@@ -38,8 +42,10 @@ const SignupForm = () => {
         } catch (error) {
             if(error.response.status === 400 || error.response.status === 409) {
                 setMessage(error.response.data);
-            }
-            else {
+            } else if (error.response && error.response.status === 403) {
+                setMessage('Invalid CAPTCHA response. Please try again.');
+                throw new Error('CAPTCHA Error');
+            } else {
                 console.error('Error during signup:', error);
                 setMessage('An error occurred during signup. Please try again later.');
             }
@@ -51,6 +57,11 @@ const SignupForm = () => {
 
         if (!email || !username || !password) {
             setMessage('Please enter all required fields.');
+            return;
+        }
+
+        if (isCaptchaEnabled && !captchaResponse) {
+            setMessage('Please complete the CAPTCHA verification.');
             return;
         }
 
@@ -101,6 +112,14 @@ const SignupForm = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
+                {isCaptchaEnabled && (
+                    <div className="form-group recaptcha-container">
+                        <ReCAPTCHA
+                            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                            onChange={setCaptchaResponse}
+                        />
+                    </div>
+                )}
                 <button className="button" type="submit">
                     Sign Up
                 </button>

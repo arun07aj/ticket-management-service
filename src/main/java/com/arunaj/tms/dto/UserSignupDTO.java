@@ -9,13 +9,15 @@ public class UserSignupDTO {
     private String username;
     private String email;
     private String password;
+    private String captchaResponse;
     @Enumerated(EnumType.STRING)
     private AccountRole role;
 
-    public UserSignupDTO(String username, String email, String password, AccountRole role) {
+    public UserSignupDTO(String username, String email, String password, String captchaResponse, AccountRole role) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.captchaResponse = captchaResponse;
         this.role = role;
     }
 
@@ -42,6 +44,10 @@ public class UserSignupDTO {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getCaptchaResponse() { return captchaResponse; }
+
+    public void setCaptchaResponse(String captchaResponse) { this.captchaResponse = captchaResponse; }
 
     public AccountRole getRole() {
         return role;

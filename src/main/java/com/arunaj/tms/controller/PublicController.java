@@ -73,6 +73,10 @@ public class PublicController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody UserSignupDTO signupDTO) {
         try{
+            // Enabled CAPTCHA for signup endpoint
+            if (captchaUtil.captchaHelper(signupDTO.getCaptchaResponse())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid reCAPTCHA response");
+            }
             return accountService.createAccount(signupDTO);
         }
         catch(BadRequestException e){
