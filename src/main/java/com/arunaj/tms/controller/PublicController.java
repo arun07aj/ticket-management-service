@@ -6,7 +6,7 @@ import com.arunaj.tms.exception.AccountAlreadyExistsException;
 import com.arunaj.tms.exception.BadRequestException;
 import com.arunaj.tms.model.Account;
 import com.arunaj.tms.service.AccountService;
-import com.arunaj.tms.service.CaptchaVerificationService;
+import com.arunaj.tms.util.CaptchaUtil;
 import com.arunaj.tms.util.JwtUtil;
 import com.arunaj.tms.util.LoggerUtil;
 import org.slf4j.Logger;
@@ -38,15 +38,15 @@ public class PublicController {
     private AccountService accountService;
 
     @Autowired
-    private CaptchaVerificationService captchaVerificationService;
+    private CaptchaUtil captchaUtil;
 
     @Autowired
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO loginDTO) throws Exception {
-        boolean captchaValid = captchaVerificationService.verifyCaptcha(loginDTO.getCaptchaResponse());
-        if (!captchaValid) {
+        // Enabled CAPTCHA for login endpoint
+        if (captchaUtil.captchaHelper(loginDTO.getCaptchaResponse())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid reCAPTCHA response");
         }
 
