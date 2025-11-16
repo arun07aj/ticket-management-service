@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = {"https://arunaj.co", "http://localhost:3000"})
+@CrossOrigin(origins = {"https://arunaj.com", "http://localhost:3000"})
 @RequestMapping("/api/public")
 public class PublicController {
     private static final Logger logger = LoggerUtil.getLogger(PublicController.class);

@@ -104,7 +104,7 @@ public class AccountService implements UserDetailsService {
         String domain = emailParts[1].toLowerCase();
 
         // List of supported domains
-        String[] supportedDomains = {"arunaj.co", "gmail.com", "outlook.com"};
+        String[] supportedDomains = {"arunaj.com", "gmail.com", "outlook.com"};
 
         // Check if the domain is in the supported list
         for (String supportedDomain : supportedDomains) {

@@ -29,7 +29,7 @@ public class CaptchaVerificationService {
         }
 
         try {
-            String url = "https://arunaj.co/verify-captcha";
+            String url = "https://arunaj.com/verify-captcha";
             Map<String, String> requestBody = Map.of("captchaResponse", captchaResponse);
 
             Map<String, Object> response = httpClientUtil.post(url, requestBody, Map.class);

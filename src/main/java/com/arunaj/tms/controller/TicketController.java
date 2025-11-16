@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = {"https://arunaj.co", "http://localhost:3000"})
+@CrossOrigin(origins = {"https://arunaj.com", "http://localhost:3000"})
 @RequestMapping("/tickets")
 public class TicketController {
     private static final Logger logger = LoggerUtil.getLogger(TicketController.class);

@@ -17,7 +17,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
 
         config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("https://arunaj.co");
+        config.addAllowedOrigin("https://arunaj.com");
 
         config.addAllowedHeader("*");
 
