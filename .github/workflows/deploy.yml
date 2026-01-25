@@ -66,7 +66,7 @@ jobs:
           export TMS_KEYSTORE_PATH=${{ secrets.SSL_KEYSTORE_PATH }}
         
           # Run the backend container (8080 of VM to 8080 of image) 
-          docker run -d --name tmsapp -p 8080:8080 \
+          docker run -d --restart unless-stopped --name tmsapp -p 127.0.0.1:8080:8080 \
             -v "${{ secrets.SSL_KEYSTORE_PATH }}:${TMS_KEYSTORE_PATH}" \
             -e SSL_KEYSTORE_PATH="${{ secrets.SSL_KEYSTORE_PATH }}" \
             -e SSL_KEYSTORE_PSWD="${{ secrets.SSL_KEYSTORE_PSWD }}" \
@@ -79,7 +79,7 @@ jobs:
             "${{ secrets.DOCKER_USERNAME }}/tmsapp:latest"
           
             # Run the frontend container (3000 of VM to 80 of image) 
-            docker run -d --name tms-fe -p 3000:80 \
+            docker run -d --restart unless-stopped --name tms-fe -p 127.0.0.1:3000:80 \
               ${{ secrets.DOCKER_USERNAME }}/tms-fe:latest
           
             echo "Reloading Nginx..."
