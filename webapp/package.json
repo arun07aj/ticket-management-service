@@ -47,7 +47,7 @@
     "@rsbuild/core": "^1.7.2",
     "@rsbuild/plugin-react": "^1.4.4",
     "env-cmd": "^10.1.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.2",
     "eslint-config-react-app": "^7.0.1"
   }
 }
