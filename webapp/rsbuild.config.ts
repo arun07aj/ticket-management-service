@@ -21,6 +21,7 @@ export default defineConfig({
         distPath: {
             root: 'build',
         },
+        assetPrefix: '/tmsapp/',
     },
 });
 
