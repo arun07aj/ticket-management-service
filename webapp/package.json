@@ -15,16 +15,15 @@
     "react-dom": "^18.2.0",
     "react-google-recaptcha": "^3.1.0",
     "react-router-dom": "^6.18.0",
-    "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "env-cmd -f .env.prod react-scripts start",
-    "build": "react-scripts build",
-    "build:dev": "env-cmd -f .env.dev npm run-script build",
-    "build:prod": "env-cmd -f .env.prod npm run-script build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "env-cmd -f .env.dev rsbuild dev",
+    "build": "rsbuild build",
+    "build:dev": "env-cmd -f .env.dev npm run build",
+    "build:prod": "env-cmd -f .env.prod npm run build",
+    "preview": "rsbuild preview",
+    "lint": "eslint src"
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +44,10 @@
     ]
   },
   "devDependencies": {
-    "env-cmd": "^10.1.0"
+    "@rsbuild/core": "^1.7.2",
+    "@rsbuild/plugin-react": "^1.4.4",
+    "env-cmd": "^10.1.0",
+    "eslint": "^9.39.2",
+    "eslint-config-react-app": "^7.0.1"
   }
 }
