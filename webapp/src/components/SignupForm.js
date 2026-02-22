@@ -3,14 +3,15 @@ import axios from 'axios';
 import ReCAPTCHA from "react-google-recaptcha"
 import DOMPurify from 'dompurify';
 import './SignupForm.css'
+import useCaptchaReset from "../hooks/useCaptchaReset";
 
 const SignupForm = () => {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [captchaResponse, setCaptchaResponse] = useState('');
     const [message, setMessage] = useState('');
     const isCaptchaEnabled = process.env.REACT_APP_ENABLE_CAPTCHA === 'true';
+    const { captchaResponse, setCaptchaResponse, recaptchaRef, resetCaptcha } = useCaptchaReset(isCaptchaEnabled);
 
     const sanitizeInput = (input) => {
         return DOMPurify.sanitize(input.trim());
@@ -38,16 +39,20 @@ const SignupForm = () => {
             setUsername('');
             setEmail('');
             setPassword('');
+            resetCaptcha();
 
         } catch (error) {
-            if(error.response.status === 400 || error.response.status === 409) {
+            if (error.response.status === 400 || error.response.status === 409) {
                 setMessage(error.response.data);
+                resetCaptcha();
             } else if (error.response && error.response.status === 403) {
                 setMessage('Invalid CAPTCHA response. Please try again.');
+                resetCaptcha();
                 throw new Error('CAPTCHA Error');
             } else {
                 console.error('Error during signup:', error);
                 setMessage('An error occurred during signup. Please try again later.');
+                resetCaptcha();
             }
         }
     };
@@ -115,8 +120,11 @@ const SignupForm = () => {
                 {isCaptchaEnabled && (
                     <div className="form-group recaptcha-container">
                         <ReCAPTCHA
+                            ref={recaptchaRef}
                             sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                             onChange={setCaptchaResponse}
+                            onExpired={() => setCaptchaResponse('')}
+                            onErrored={resetCaptcha}
                         />
                     </div>
                 )}

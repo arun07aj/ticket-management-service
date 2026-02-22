@@ -6,18 +6,19 @@ import Cookies from 'js-cookie';
 import ReCAPTCHA from "react-google-recaptcha"
 import './LoginForm.css'
 import useAuthentication from "../hooks/useAuthentication";
+import useCaptchaReset from "../hooks/useCaptchaReset";
 
 const LoginForm = ({ setAuthenticated }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
-    const [captchaResponse, setCaptchaResponse] = useState('');
     const navigate = useNavigate();
 
     // Check for existing authentication token on component mount
     useAuthentication(setAuthenticated);
 
     const isCaptchaEnabled = process.env.REACT_APP_ENABLE_CAPTCHA === 'true';
+    const { captchaResponse, setCaptchaResponse, recaptchaRef, resetCaptcha } = useCaptchaReset(isCaptchaEnabled);
 
     const handleLogin = async () => {
         try {
@@ -50,16 +51,20 @@ const LoginForm = ({ setAuthenticated }) => {
             // Handle login error
             if (error.message === 'Network Error') {
                 setMessage('Unable to connect to the server. Please check your internet connection.');
+                resetCaptcha();
                 throw new Error('Network Error');
             }
             else if (error.response && error.response.status === 401) {
                 setMessage('Invalid username or password. Please try again.');
+                resetCaptcha();
                 throw new Error('Authentication Error');
             } else if (error.response && error.response.status === 403) {
                 setMessage('Invalid CAPTCHA response. Please try again.');
+                resetCaptcha();
                 throw new Error('CAPTCHA Error');
             } else {
                 setMessage('An error occurred during login. Please try again later.');
+                resetCaptcha();
                 throw error;
             }
         }
@@ -118,8 +123,11 @@ const LoginForm = ({ setAuthenticated }) => {
                 {isCaptchaEnabled && (
                     <div className="form-group recaptcha-container">
                         <ReCAPTCHA
+                            ref={recaptchaRef}
                             sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                             onChange={setCaptchaResponse}
+                            onExpired={() => setCaptchaResponse('')}
+                            onErrored={resetCaptcha}
                         />
                     </div>
                 )}
