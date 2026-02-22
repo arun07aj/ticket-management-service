@@ -9,7 +9,7 @@ public class CaptchaUtil {
     @Autowired
     private CaptchaVerificationService captchaVerificationService;
 
-    public boolean captchaHelper(String captchaResponse) {
-        return !captchaVerificationService.verifyCaptcha(captchaResponse);
+    public boolean isCaptchaValid(String captchaResponse) {
+        return captchaVerificationService.verifyCaptcha(captchaResponse);
     }
 }

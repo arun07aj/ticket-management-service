@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @RestController
 @CrossOrigin(origins = {"https://arunaj.com", "http://localhost:3000"})
 @RequestMapping("/api/public")
@@ -46,48 +44,67 @@ public class PublicController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO loginDTO) throws Exception {
         // Enabled CAPTCHA for login endpoint
-        if (captchaUtil.captchaHelper(loginDTO.getCaptchaResponse())) {
+        if (!captchaUtil.isCaptchaValid(loginDTO.getCaptchaResponse())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid reCAPTCHA response");
         }
 
-        authenticate(loginDTO.getUsername(), loginDTO.getPassword());
-        final Optional<Account> account = accountService.loadAccountByUsername(loginDTO.getUsername());
-        if(account.isPresent()) {
-            final String token = jwtUtil.generateToken(account.get());
-            logger.info("login successful");
+        try {
+            authenticate(loginDTO.getUsername(), loginDTO.getPassword());
+            Account account = accountService.loadAccountByUsername(loginDTO.getUsername())
+                    .orElseThrow(() -> {
+                        logger.error("Authentication succeeded but account not found: {}", loginDTO.getUsername());
+                        return new IllegalStateException("Account not found after authentication");
+                    });
+
+            if (account == null) {
+                logger.error("Authentication succeeded but account not found: {}", loginDTO.getUsername());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login failed");
+            }
+
+            final String token = jwtUtil.generateToken(account);
+            logger.info("Login successful for user: {}", loginDTO.getUsername());
             return ResponseEntity.status(HttpStatus.OK).body(token);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+        catch (DisabledException e) {
+            logger.warn("Disabled account login attempt: {}", loginDTO.getUsername());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User account is disabled");
+        } catch (BadCredentialsException e) {
+            logger.warn("Invalid credentials for user: {}", loginDTO.getUsername());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+        catch (Exception e){
+            logger.error("Unexpected login error for user: {}", loginDTO.getUsername(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login failed");
+        }
     }
 
-    private void authenticate(String username, String password) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
-        }
+    private void authenticate(String username, String password) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody UserSignupDTO signupDTO) {
+        // Enabled CAPTCHA for signup endpoint
+        if (!captchaUtil.isCaptchaValid(signupDTO.getCaptchaResponse())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid reCAPTCHA response");
+        }
+
         try{
-            // Enabled CAPTCHA for signup endpoint
-            if (captchaUtil.captchaHelper(signupDTO.getCaptchaResponse())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid reCAPTCHA response");
-            }
-            return accountService.createAccount(signupDTO);
+            ResponseEntity<?> response = accountService.createAccount(signupDTO);
+            logger.info("Account created successfully for username: {}", signupDTO.getUsername());
+            return response;
         }
         catch(BadRequestException e){
+            logger.warn("Invalid signup request for username: {} - {}", signupDTO.getUsername(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         catch(AccountAlreadyExistsException e) {
+            logger.warn("Account with same username exists: {}", signupDTO.getUsername());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
         catch(Exception e){
-            logger.error("Failed to create account: {}", String.valueOf(e));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating account at the moment");
+            logger.error("Unexpected signup error for username: {}", signupDTO.getUsername(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Signup failed");
         }
     }
 
